@@ -16,11 +16,17 @@ body {
 }
 
 .trello-card {
-    padding-bottom: 30px;
+    padding: 5px;
+    margin-bottom: 10px;
 }
 
 .card-input {
     border: none;
-    width: 100%;
+    resize: none;
     padding-left: 5px;
+    padding-right: 5px;
+}
+
+.card-input:focus {
+    outline: none;
 }
