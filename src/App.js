@@ -1,9 +1,10 @@
 import React from 'react';
+import { Column } from './components/Column';
 
 function App() {
 	return (
-		<div className="App">
-			
+		<div className='trello-container'>
+			<Column />
 		</div>
 	);
 }

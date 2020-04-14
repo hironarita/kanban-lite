@@ -1,0 +1,16 @@
+body {
+    background-color: #3F88C5;
+    color: #393E41;
+}
+
+.trello-container {
+    display: flex;
+    margin: 20px 20px 20px 20px;
+}
+
+.column {
+    width: 300px;
+    background-color: #F6F7EB;
+    border-radius: 2px;
+    padding: 10px 10px;
+}
