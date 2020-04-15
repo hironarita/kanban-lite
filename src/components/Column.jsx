@@ -1,23 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card } from './Card';
+import { useDrop } from 'react-dnd'
 
-export function Column() {
+let cardId = 0;
+
+export function Column({ columnId, setParentCards, cards, moveCard }) {
     const [displayCard, setDisplayCard] = useState(false);
-    const [cards, setCards] = useState([]);
     const [cardTitle, setCardTitle] = useState('');
 
     const addCard = (title) => {
         if (title.length > 0) {
             setCardTitle('');
-            setCards(cards.concat([{ title }]));
+            setParentCards(title, columnId, cardId++);
         }
         setDisplayCard(false);
     };
 
+    const [, drop] = useDrop({
+        accept: 'card',
+        drop: (item) => {
+            const oldCard = {
+                cardId: item.cardId,
+                title: item.title,
+                columnId: item.columnId
+            };
+            const newCard = {
+                cardid: item.cardId,
+                title: item.title,
+                columnId: columnId
+            };
+            moveCard(oldCard, newCard);
+        }
+    })
+
+    const filteredCards = useMemo(() => cards.filter(x => x.columnId === columnId), [cards, columnId]);
+
     return (
         <div className='column'>
             <h4>Test</h4>
-            {cards.map((x, i) => <Card key={i} isAdding={false} title={x.title} />)}
+            <div className='card trello-card' ref={drop}></div>
+            {filteredCards.map((x, i) => <Card key={i} isAdding={false} title={x.title} cardId={x.cardId} columnId={columnId} />)}
             {displayCard === true &&
                 <Card
                     isAdding={true}

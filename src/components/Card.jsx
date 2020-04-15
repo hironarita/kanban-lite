@@ -2,7 +2,7 @@ import React from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag } from 'react-dnd';
 
-export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, isDragging }) {
+export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId }) {
     const handleKeyDown = (key) => {
         if (key === 'Enter') {
             addCard(newTitle);
@@ -18,7 +18,7 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, i
     };
 
     const [{ opacity }, dragRef] = useDrag({
-        item: { type: 'card', title },
+        item: { type: 'card', title, cardId, columnId },
         collect: monitor => ({
             opacity: monitor.isDragging() ? 0.5 : 1,
         }),
