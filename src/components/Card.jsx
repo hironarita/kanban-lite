@@ -1,7 +1,8 @@
 import React from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
+import { useDrag } from 'react-dnd';
 
-export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle }) {
+export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, isDragging }) {
     const handleKeyDown = (key) => {
         if (key === 'Enter') {
             addCard(newTitle);
@@ -9,7 +10,6 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle })
     };
 
     const handleOnBlur = () => {
-        console.log('blur')
         addCard(newTitle);
     };
 
@@ -17,8 +17,15 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle })
         setParentCardTitle(title);
     };
 
+    const [{ opacity }, dragRef] = useDrag({
+        item: { type: 'card', title },
+        collect: monitor => ({
+            opacity: monitor.isDragging() ? 0.5 : 1,
+        }),
+    });
+
     return (
-        <div className='card trello-card'>
+        <div ref={dragRef} className={'card trello-card ' + opacity}>
             {isAdding === false && <span>{title}</span>}
             {isAdding === true &&
                 <TextareaAutosize
