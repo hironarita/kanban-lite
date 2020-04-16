@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { useDrag } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
+import { CardModel } from '../models/Card';
 
-export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId, setFilterCardId, resetFilterCardId }) {
+export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId, moveCard }) {
+    const ref = useRef(null);
+
     const [isDragging, setIsDragging] = useState(false);
 
     const handleKeyDown = (key) => {
@@ -19,14 +22,27 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
         setParentCardTitle(title);
     };
 
-    const [, dragRef] = useDrag({
+    const [, drag] = useDrag({
         item: { type: 'card', title, cardId, columnId },
         collect: monitor => monitor.isDragging() ? setIsDragging(true) : setIsDragging(false)
     });
 
+    const [, drop] = useDrop({
+        accept: 'card',
+        drop: (item) => {
+            const oldCard = new CardModel(item.cardId, item.title, item.columnId);
+            const newCard = new CardModel(cardId, item.title, columnId);
+            moveCard(oldCard, newCard);
+        },
+        hover: (item) => { if (item.title !== title) { console.log(item) } }
+    })
+
+    // allows for the Card component to be both dragged and dropped on
+    drag(drop(ref));
+
     return (
-        <div ref={dragRef} className={'card trello-card ' + (isDragging == true ? 'hide' : '')}>
-            {isAdding === false && <span>{title}</span>}
+        <div ref={ref} className={'card trello-card ' + (isDragging === true ? 'droppable-card' : '')}>
+            {isAdding === false && <span>{isDragging === false && title}</span>}
             {isAdding === true &&
                 <TextareaAutosize
                     type='text'

@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Card } from './Card';
-import { DroppableCard } from './DroppableCard';
-
-let cardId = 0;
 
 export function Column({ columnId, setParentCards, cards, moveCard }) {
+    let cardId = 0;
+
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
 
@@ -24,21 +23,13 @@ export function Column({ columnId, setParentCards, cards, moveCard }) {
         <div className='column'>
             <h4>Test</h4>
             {filteredCards.map((x, i) =>
-                <div key={i}>
-                    <DroppableCard
-                        cardId={x.CardId - 1}
-                        moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)}
-                        columnId={columnId} />
-                    <Card
-                        isAdding={false}
-                        title={x.Title}
-                        cardId={x.CardId}
-                        columnId={columnId} />
-                    <DroppableCard
-                        cardId={x.CardId + 1}
-                        moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)}
-                        columnId={columnId} />
-                </div>
+                <Card
+                    key={i}
+                    isAdding={false}
+                    title={x.Title}
+                    cardId={x.CardId}
+                    columnId={columnId}
+                    moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)} />
             )}
             {displayCard === true &&
                 <Card
