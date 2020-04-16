@@ -31,3 +31,12 @@ body {
 .card-input:focus {
     outline: none;
 }
+
+.droppable-card {
+    height: 36px;
+    opacity: 0.5;
+}
+
+.hide {
+    display: none;
+}

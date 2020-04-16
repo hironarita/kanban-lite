@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag } from 'react-dnd';
 
-export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId }) {
+export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId, setFilterCardId, resetFilterCardId }) {
+    const [isDragging, setIsDragging] = useState(false);
+
     const handleKeyDown = (key) => {
         if (key === 'Enter') {
             addCard(newTitle);
@@ -17,15 +19,13 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
         setParentCardTitle(title);
     };
 
-    const [{ opacity }, dragRef] = useDrag({
+    const [, dragRef] = useDrag({
         item: { type: 'card', title, cardId, columnId },
-        collect: monitor => ({
-            opacity: monitor.isDragging() ? 0.5 : 1,
-        }),
+        collect: monitor => monitor.isDragging() ? setIsDragging(true) : setIsDragging(false)
     });
 
     return (
-        <div ref={dragRef} className={'card trello-card ' + opacity}>
+        <div ref={dragRef} className={'card trello-card ' + (isDragging == true ? 'hide' : '')}>
             {isAdding === false && <span>{title}</span>}
             {isAdding === true &&
                 <TextareaAutosize

@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useDrop } from 'react-dnd'
 import { Card } from './Card';
-import { CardModel } from '../models/Card';
+import { DroppableCard } from './DroppableCard';
 
 let cardId = 0;
 
@@ -17,22 +16,30 @@ export function Column({ columnId, setParentCards, cards, moveCard }) {
         setDisplayCard(false);
     };
 
-    const [, drop] = useDrop({
-        accept: 'card',
-        drop: (item) => {
-            const oldCard = new CardModel(item.cardId, item.title, item.columnId);
-            const newCard = new CardModel(item.cardId, item.title, columnId);
-            moveCard(oldCard, newCard);
-        }
-    })
-
-    const filteredCards = useMemo(() => cards.filter(x => x.ColumnId === columnId), [cards, columnId]);
+    const filteredCards = useMemo(() => cards
+        .sort((x, y) => x.CardId > y.CardId ? 1 : -1)
+        .filter(x => x.ColumnId === columnId), [cards, columnId]);
 
     return (
         <div className='column'>
             <h4>Test</h4>
-            <div className='card trello-card' ref={drop}></div>
-            {filteredCards.map((x, i) => <Card key={i} isAdding={false} title={x.Title} cardId={x.CardId} columnId={columnId} />)}
+            {filteredCards.map((x, i) =>
+                <div key={i}>
+                    <DroppableCard
+                        cardId={x.CardId - 1}
+                        moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)}
+                        columnId={columnId} />
+                    <Card
+                        isAdding={false}
+                        title={x.Title}
+                        cardId={x.CardId}
+                        columnId={columnId} />
+                    <DroppableCard
+                        cardId={x.CardId + 1}
+                        moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)}
+                        columnId={columnId} />
+                </div>
+            )}
             {displayCard === true &&
                 <Card
                     isAdding={true}
