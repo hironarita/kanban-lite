@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { Column } from './components/Column';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
+import { Column } from './components/Column';
+import { CardModel } from './models/Card';
 
 function App() {
 	const [cards, setCards] = useState([]);
 
 	const setParentCards = (title, columnId, cardId) => {
-		setCards(cards.concat([{ title, cardId, columnId }]));
+		const card = new CardModel(cardId, title, columnId);
+		setCards(cards.concat([card]));
 	};
 
 	const moveCard = (oldCard, newCard) => {
 		const foo = cards
-			.filter(x => !(x.cardId === oldCard.cardId && x.columnId === oldCard.columnId))
-			.concat([{ title: newCard.title, cardId: newCard.cardId, columnId: newCard.columnId }]);
+			.filter(x => !(x.CardId === oldCard.CardId && x.ColumnId === oldCard.ColumnId))
+			.concat([newCard]);
 		setCards(foo);
 	};
 
