@@ -12,24 +12,21 @@ function App() {
 		setCards(cards.concat([card]));
 	};
 
-	const moveCard = (oldCard, newCard) => {
-		const foo = cards
-			.filter(x => !(x.CardId === oldCard.CardId && x.ColumnId === oldCard.ColumnId))
-			.concat([newCard]);
-		setCards(foo);
+	const moveCard = (oldCardId, newCard) => {
+		const clonedCards = cards.slice();
+		clonedCards.splice(newCard.CardId, 0, newCard);
+		const filtered = clonedCards.filter(x => x.CardId !== oldCardId);
+		setCards(filtered);
 	};
 
 	return (
 		<DndProvider backend={Backend}>
 			<div className='trello-container'>
-				{Array.from({ length: 2 }).map((_x, i) =>
-					<Column
-						key={i}
-						columnId={i}
-						setParentCards={(title, columnId, cardId) => setParentCards(title, columnId, cardId)}
-						cards={cards}
-						moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)} />
-				)}
+				<Column
+					columnId={0}
+					setParentCards={(title, columnId, cardId) => setParentCards(title, columnId, cardId)}
+					cards={cards}
+					moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)} />
 			</div>
 		</DndProvider>
 	);

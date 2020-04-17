@@ -7,6 +7,8 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
     const ref = useRef(null);
 
     const [isDragging, setIsDragging] = useState(false);
+    const [displayDroppableCardAbove, setDisplayDroppableCardAbove] = useState(false);
+    const [displayDroppableCardBelow, setDisplayDroppableCardBelow] = useState(false);
 
     const handleKeyDown = (key) => {
         if (key === 'Enter') {
@@ -30,30 +32,48 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
     const [, drop] = useDrop({
         accept: 'card',
         drop: (item) => {
-            const oldCard = new CardModel(item.cardId, item.title, item.columnId);
-            const newCard = new CardModel(cardId, item.title, columnId);
-            moveCard(oldCard, newCard);
+            setDisplayDroppableCardAbove(false);
+            setDisplayDroppableCardBelow(false);
+            const newCard = new CardModel(Date.now(), item.title, columnId);
+            moveCard(item.cardId, newCard);
         },
-        hover: (item) => { if (item.title !== title) { console.log(item) } }
+        hover: (item, monitor) => {
+            if (item.cardId !== cardId) {
+                const offset = monitor.getInitialClientOffset().y;
+                if (monitor.getClientOffset().y > offset) {
+                    return setDisplayDroppableCardBelow(true);
+                }
+                if (monitor.getClientOffset().y < offset) {
+                    return setDisplayDroppableCardAbove(true);
+                }
+
+                setDisplayDroppableCardAbove(false);
+                setDisplayDroppableCardBelow(false);
+            }
+        }
     })
 
     // allows for the Card component to be both dragged and dropped on
     drag(drop(ref));
 
     return (
-        <div ref={ref} className={'card trello-card ' + (isDragging === true ? 'droppable-card' : '')}>
-            {isAdding === false && <span>{isDragging === false && title}</span>}
-            {isAdding === true &&
-                <TextareaAutosize
-                    type='text'
-                    autoFocus
-                    className='card-input'
-                    value={newTitle}
-                    placeholder='Enter a title for this card...'
-                    onChange={e => handleOnChange(e.target.value)}
-                    onKeyDown={e => handleKeyDown(e.key)}
-                    onBlur={() => handleOnBlur()} />
-            }
+        <div ref={ref}>
+            {displayDroppableCardAbove === true && <div className='card trello-card droppable-card'></div>}
+            <div className={'card trello-card ' + (isDragging === true ? 'hide' : '')}>
+                {isAdding === false && <span>{isDragging === false && title}</span>}
+                {isAdding === true &&
+                    <TextareaAutosize
+                        type='text'
+                        autoFocus
+                        className='card-input'
+                        value={newTitle}
+                        placeholder='Enter a title for this card...'
+                        onChange={e => handleOnChange(e.target.value)}
+                        onKeyDown={e => handleKeyDown(e.key)}
+                        onBlur={() => handleOnBlur()} />
+                }
+            </div>
+            {displayDroppableCardBelow === true && <div className='card trello-card droppable-card'></div>}
         </div>
     )
 }
