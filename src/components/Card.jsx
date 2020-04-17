@@ -3,7 +3,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { CardModel } from '../models/Card';
 
-export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId, moveCard }) {
+export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId, moveCard, highlightedCardId, setHighlightedCardId }) {
     const ref = useRef(null);
 
     const [isDragging, setIsDragging] = useState(false);
@@ -26,29 +26,33 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
 
     const [, drag] = useDrag({
         item: { type: 'card', title, cardId, columnId },
-        collect: monitor => monitor.isDragging() ? setIsDragging(true) : setIsDragging(false)
+        collect: monitor => {
+            if (monitor.isDragging()) setIsDragging(true)
+            else {
+                setIsDragging(false);
+                setDisplayDroppableCardAbove(false);
+                setDisplayDroppableCardBelow(false);
+            }
+        },
     });
 
     const [, drop] = useDrop({
         accept: 'card',
         drop: (item) => {
-            setDisplayDroppableCardAbove(false);
-            setDisplayDroppableCardBelow(false);
             const newCard = new CardModel(Date.now(), item.title, columnId);
             moveCard(item.cardId, newCard);
         },
-        hover: (item, monitor) => {
-            if (item.cardId !== cardId) {
-                const offset = monitor.getInitialClientOffset().y;
-                if (monitor.getClientOffset().y > offset) {
-                    return setDisplayDroppableCardBelow(true);
-                }
-                if (monitor.getClientOffset().y < offset) {
-                    return setDisplayDroppableCardAbove(true);
-                }
+        hover: (_item, monitor) => {
+            if (monitor.isOver()) setHighlightedCardId(cardId)
 
-                setDisplayDroppableCardAbove(false);
+            const initialOffset = monitor.getInitialClientOffset();
+            if (monitor.getClientOffset().y < initialOffset.y) {
+                setDisplayDroppableCardAbove(true);
                 setDisplayDroppableCardBelow(false);
+            }
+            if (monitor.getClientOffset().y > initialOffset.y) {
+                setDisplayDroppableCardBelow(true);
+                setDisplayDroppableCardAbove(false);
             }
         }
     })
@@ -58,7 +62,7 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
 
     return (
         <div ref={ref}>
-            {displayDroppableCardAbove === true && <div className='card trello-card droppable-card'></div>}
+            {displayDroppableCardAbove === true && highlightedCardId === cardId && <div className='card trello-card droppable-card'></div>}
             <div className={'card trello-card ' + (isDragging === true ? 'hide' : '')}>
                 {isAdding === false && <span>{isDragging === false && title}</span>}
                 {isAdding === true &&
@@ -73,7 +77,7 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
                         onBlur={() => handleOnBlur()} />
                 }
             </div>
-            {displayDroppableCardBelow === true && <div className='card trello-card droppable-card'></div>}
+            {displayDroppableCardBelow === true && highlightedCardId === cardId && <div className='card trello-card droppable-card'></div>}
         </div>
     )
 }

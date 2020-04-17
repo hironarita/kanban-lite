@@ -4,6 +4,7 @@ import { Card } from './Card';
 export function Column({ columnId, setParentCards, cards, moveCard }) {
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
+    const [highlightedCardId, setHighlightedCardId] = useState('');
 
     const addCard = (title) => {
         if (title.length > 0) {
@@ -25,6 +26,8 @@ export function Column({ columnId, setParentCards, cards, moveCard }) {
                     title={x.Title}
                     cardId={x.CardId}
                     columnId={columnId}
+                    highlightedCardId={highlightedCardId}
+                    setHighlightedCardId={(id) => setHighlightedCardId(id)}
                     moveCard={(oldCardId, newCard) => moveCard(oldCardId, newCard)} />
             )}
             {displayCard === true &&
