@@ -7,8 +7,8 @@ import { CardModel } from './models/Card';
 function App() {
 	const [cards, setCards] = useState([]);
 
-	const setParentCards = (title, columnId, cardId) => {
-		const card = new CardModel(cardId, title, columnId);
+	const setParentCards = (title, columnId, cardId, columnIndex) => {
+		const card = new CardModel(cardId, title, columnId, columnIndex);
 		setCards(cards.concat([card]));
 	};
 
@@ -24,7 +24,7 @@ function App() {
 			<div className='trello-container'>
 				<Column
 					columnId={0}
-					setParentCards={(title, columnId, cardId) => setParentCards(title, columnId, cardId)}
+					setParentCards={(title, columnId, cardId, columnIndex) => setParentCards(title, columnId, cardId, columnIndex)}
 					cards={cards}
 					moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)} />
 			</div>

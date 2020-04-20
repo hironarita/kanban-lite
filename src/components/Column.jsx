@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Card } from './Card';
 
+let columnIndex = 0;
+
 export function Column({ columnId, setParentCards, cards, moveCard }) {
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
@@ -9,12 +11,14 @@ export function Column({ columnId, setParentCards, cards, moveCard }) {
     const addCard = (title) => {
         if (title.length > 0) {
             setCardTitle('');
-            setParentCards(title, columnId, Date.now());
+            setParentCards(title, columnId, Date.now(), columnIndex++);
         }
         setDisplayCard(false);
     };
 
-    const filteredCards = useMemo(() => cards.filter(x => x.ColumnId === columnId), [cards, columnId]);
+    const filteredCards = useMemo(() => cards
+        .filter(x => x.ColumnId === columnId)
+        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [cards, columnId]);
 
     return (
         <div className='column'>
@@ -26,7 +30,11 @@ export function Column({ columnId, setParentCards, cards, moveCard }) {
                     title={x.Title}
                     cardId={x.CardId}
                     columnId={columnId}
+                    columnIndex={x.ColumnIndex}
+
+                    // determines which card is being hovered over
                     highlightedCardId={highlightedCardId}
+
                     setHighlightedCardId={(id) => setHighlightedCardId(id)}
                     moveCard={(oldCardId, newCard) => moveCard(oldCardId, newCard)} />
             )}

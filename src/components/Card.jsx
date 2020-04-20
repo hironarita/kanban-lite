@@ -3,7 +3,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { CardModel } from '../models/Card';
 
-export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId, moveCard, highlightedCardId, setHighlightedCardId }) {
+export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, cardId, columnId, moveCard, highlightedCardId, setHighlightedCardId, columnIndex }) {
     const ref = useRef(null);
 
     const [isDragging, setIsDragging] = useState(false);
@@ -39,11 +39,11 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
     const [, drop] = useDrop({
         accept: 'card',
         drop: (item) => {
-            const newCard = new CardModel(Date.now(), item.title, columnId);
+            const newCard = new CardModel(Date.now(), item.title, columnId, columnIndex);
             moveCard(item.cardId, newCard);
         },
         hover: (_item, monitor) => {
-            if (monitor.isOver()) setHighlightedCardId(cardId)
+            if (monitor.isOver()) setHighlightedCardId(cardId);
 
             const initialOffset = monitor.getInitialClientOffset();
             if (monitor.getClientOffset().y < initialOffset.y) {
