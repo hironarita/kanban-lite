@@ -39,7 +39,11 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
     const [, drop] = useDrop({
         accept: 'card',
         drop: (item) => {
-            const newCard = new CardModel(Date.now(), item.title, columnId, columnIndex);
+            const colIndex = displayDroppableCardAbove === true
+                ? columnIndex - 1
+                : columnIndex + 1;
+            console.log(colIndex)
+            const newCard = new CardModel(Date.now(), item.title, columnId, colIndex);
             moveCard(item.cardId, newCard);
         },
         hover: (_item, monitor) => {
