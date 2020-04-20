@@ -36,13 +36,13 @@ export function Column({ columnId, setParentCards, cards, moveCard }) {
 
     return (
         <div className='column'>
-            <div>
+            <div className='mb-2'>
                 <TextareaAutosize
                     type='text'
                     inputRef={textarea}
                     className='column-title'
                     value={columnTitle}
-                    placeholder='Enter column title...'
+                    placeholder='Enter list title...'
                     onChange={e => handleOnChange(e.target.value)}
                     onKeyDown={e => handleKeyDown(e.key)} />
             </div>

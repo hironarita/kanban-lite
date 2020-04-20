@@ -23,11 +23,16 @@ function App() {
 	return (
 		<DndProvider backend={Backend}>
 			<div className='trello-container'>
-				<Column
-					columnId={0}
-					setParentCards={(title, columnId, cardId, columnIndex) => setParentCards(title, columnId, cardId, columnIndex)}
-					cards={cards}
-					moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)} />
+				<div>
+					<Column
+						columnId={0}
+						setParentCards={(title, columnId, cardId, columnIndex) => setParentCards(title, columnId, cardId, columnIndex)}
+						cards={cards}
+						moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)} />
+				</div>
+				<div>
+					<button type='button' className='btn btn-secondary'>+ Add another list</button>
+				</div>
 			</div>
 		</DndProvider>
 	);
