@@ -42,7 +42,6 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
             const colIndex = displayDroppableCardAbove === true
                 ? columnIndex - 1
                 : columnIndex + 1;
-            console.log(colIndex)
             const newCard = new CardModel(Date.now(), item.title, columnId, colIndex);
             moveCard(item.cardId, newCard);
         },
