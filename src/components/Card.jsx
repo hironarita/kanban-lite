@@ -40,7 +40,7 @@ export function Card({ isAdding, addCard, title, setParentCardTitle, newTitle, c
         accept: 'card',
         drop: (item) => {
             const colIndex = displayDroppableCardAbove === true
-                ? columnIndex - 1
+                ? columnIndex
                 : columnIndex + 1;
             const newCard = new CardModel(Date.now(), item.title, columnId, colIndex);
             moveCard(item.cardId, newCard);

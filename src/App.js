@@ -14,9 +14,10 @@ function App() {
 
 	const moveCard = (oldCardId, newCard) => {
 		const clonedCards = cards.slice();
-		clonedCards.splice(newCard.CardId, 0, newCard);
+		clonedCards.splice(newCard.ColumnIndex, 0, newCard);
 		const filtered = clonedCards.filter(x => x.CardId !== oldCardId);
-		setCards(filtered);
+		const newCards = filtered.map((x, i) => new CardModel(x.CardId, x.Title, x.ColumnId, i));
+		setCards(newCards);
 	};
 
 	return (
