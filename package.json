@@ -1,5 +1,5 @@
 {
-  "name": "trello-clone",
+  "name": "trello-lite",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,7 +11,8 @@
     "react-dnd-html5-backend": "^10.0.2",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "react-textarea-autosize": "^7.1.2"
+    "react-textarea-autosize": "^7.1.2",
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "start": "react-scripts start",

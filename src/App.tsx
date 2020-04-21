@@ -5,14 +5,14 @@ import { Column } from './components/Column';
 import { CardModel } from './models/Card';
 
 function App() {
-	const [cards, setCards] = useState([]);
+	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
 
-	const setParentCards = (title, columnId, cardId, columnIndex) => {
+	const setParentCards = (title: string, columnId: number, cardId: number, columnIndex: number) => {
 		const card = new CardModel(cardId, title, columnId, columnIndex);
 		setCards(cards.concat([card]));
 	};
 
-	const moveCard = (oldCardId, newCard) => {
+	const moveCard = (oldCardId: number, newCard: CardModel) => {
 		const clonedCards = cards.slice();
 		clonedCards.splice(newCard.ColumnIndex, 0, newCard);
 		const filtered = clonedCards.filter(x => x.CardId !== oldCardId);
@@ -26,9 +26,9 @@ function App() {
 				<div>
 					<Column
 						columnId={0}
-						setParentCards={(title, columnId, cardId, columnIndex) => setParentCards(title, columnId, cardId, columnIndex)}
+						setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 						cards={cards}
-						moveCard={(oldCard, newCard) => moveCard(oldCard, newCard)} />
+						moveCard={(oldCardId: number, newCard: CardModel) => moveCard(oldCardId, newCard)} />
 				</div>
 				<div>
 					<button type='button' className='btn btn-secondary'>+ Add another list</button>
