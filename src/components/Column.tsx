@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { Card } from './Card';
 import { CardModel } from '../models/Card';
+import { ColumnModel } from '../models/Column';
 
 let columnIndex = 0;
 
@@ -10,6 +11,7 @@ declare interface IColumnProps {
     readonly setParentCards: (title: string, columnId: number, cardId: number, columnIndex: number) => void;
     readonly cards: ReadonlyArray<CardModel>;
     readonly moveCard: (cardId: number, newCard: CardModel) => void;
+    readonly moveColumn: (columnId: number, newColumn: ColumnModel) => void;
 }
 
 export function Column(props: IColumnProps) {

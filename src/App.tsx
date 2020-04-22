@@ -32,6 +32,15 @@ function App() {
 		setColumns(clonedColumns);
 	};
 
+	const moveColumn = (oldColumnId: number, newColumn: ColumnModel) => {
+		const clonedColumns = columns.slice();
+		clonedColumns.splice(newColumn.BoardIndex, 0, newColumn);
+		const newColumns = clonedColumns
+			.filter(x => x.Id !== oldColumnId)
+			.map((x, i) => new ColumnModel(Date.now(), x.Title, i));
+		setColumns(newColumns);
+	};
+
 	return (
 		<DndProvider backend={Backend}>
 			<div className='trello-container'>
@@ -41,7 +50,8 @@ function App() {
 							columnId={x.Id}
 							setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 							cards={cards}
-							moveCard={(oldCardId: number, newCard: CardModel) => moveCard(oldCardId, newCard)} />
+							moveCard={(oldCardId: number, newCard: CardModel) => moveCard(oldCardId, newCard)}
+							moveColumn={(oldColumnId: number, newColumn: ColumnModel) => moveColumn(oldColumnId, newColumn)} />
 					</div>				
 				)}
 				<div>
