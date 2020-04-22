@@ -20,14 +20,26 @@ function App() {
 		setCards(cards.concat([card]));
 	};
 
-	const moveCard = (oldCardId: number, newCard: CardModel) => {
+	const moveCard = (oldCardId: number, newCard: CardModel, oldColumnId: number) => {
 		const clonedCards = cards.slice();
-		const filteredCards = clonedCards
-			.filter(x => x.Id !== oldCardId)
-			.filter(x => x.ColumnId === newCard.ColumnId);
-		filteredCards.splice(newCard.ColumnIndex, 0, newCard);
-		const newCards = filteredCards.map((x, i) => new CardModel(x.Id, x.Title, x.ColumnId, i));
-		setCards(newCards);
+		const allCardsExceptOldCard = clonedCards.filter(x => x.Id !== oldCardId);
+
+		const newColumnCards = allCardsExceptOldCard.filter(x => x.ColumnId === newCard.ColumnId);
+		newColumnCards.splice(newCard.ColumnIndex, 0, newCard);
+		const newCards = newColumnCards.map((x, i) => new CardModel(x.Id, x.Title, x.ColumnId, i));
+
+		// reset column indexes on cards in the old column
+		let resetCards: ReadonlyArray<CardModel> = [];
+		if (newCard.ColumnId !== oldColumnId) {
+			resetCards = allCardsExceptOldCard
+				.filter(x => x.ColumnId === oldColumnId)
+				.map((x, i) => new CardModel(x.Id, x.Title, x.ColumnId, i));
+		}
+
+		const unchangedCards = allCardsExceptOldCard
+			.filter(x => x.ColumnId !== newCard.ColumnId)
+			.filter(x => x.ColumnId !== oldColumnId);
+		setCards(unchangedCards.concat(newCards).concat(resetCards));
 	};
 
 	const addColumn = () => {
@@ -52,8 +64,7 @@ function App() {
 		setColumns(newColumns);
 	};
 
-	console.log('cards', cards);
-	console.log('columns', columns);
+	console.log(cards);
 
 	return (
 		<DndProvider backend={Backend}>
@@ -65,11 +76,12 @@ function App() {
 							boardIndex={x.BoardIndex}
 							highlightedColumnId={highlightedColumnId}
 							title={x.Title}
+							cardCount={cards.filter(y => y.ColumnId === x.Id).length}
 							cards={cards}
 							changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}
 							setHighlightedColumnId={(id) => sethighlightedColumnId(id)}
 							setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
-							moveCard={(oldCardId: number, newCard: CardModel) => moveCard(oldCardId, newCard)}
+							moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
 							moveColumn={(oldColumnId: number, newColumn: ColumnModel) => moveColumn(oldColumnId, newColumn)} />
 					</div>				
 				)}

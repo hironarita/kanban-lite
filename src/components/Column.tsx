@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { Card } from './Card';
@@ -8,13 +8,17 @@ import { ColumnModel } from '../models/Column';
 declare interface IColumnProps {
     readonly columnId: number;
     readonly boardIndex: number;
+
+    /** determines which card is being hovered over */
     readonly highlightedColumnId: number;
+
     readonly title: string;
+    readonly cardCount: number;
     readonly cards: ReadonlyArray<CardModel>;
     readonly changeColumnTitle: (columnId: number, newTitle: string, boardIndex: number) => void;
     readonly setHighlightedColumnId: (id: number) => void;
     readonly setParentCards: (title: string, columnId: number, cardId: number, columnIndex: number) => void;
-    readonly moveCard: (cardId: number, newCard: CardModel) => void;
+    readonly moveCard: (cardId: number, newCard: CardModel, oldColumnId: number) => void;
     readonly moveColumn: (columnId: number, newColumn: ColumnModel) => void;
 }
 
@@ -35,7 +39,9 @@ export function Column(props: IColumnProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableLeftColumn, setDisplayDroppableLeftColumn] = useState(false);
     const [displayDroppableRightColumn, setDisplayDroppableRightColumn] = useState(false);
-    const [columnIndex, setColumnIndex] = useState(0);
+    const [columnIndex, setColumnIndex] = useState(props.cardCount);
+
+    useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
     const filteredCards = useMemo(() => props.cards
         .filter(x => x.ColumnId === props.columnId)
@@ -138,7 +144,7 @@ export function Column(props: IColumnProps) {
                         columnIndex={x.ColumnIndex}
                         highlightedCardId={highlightedCardId}
                         setHighlightedCardId={(id) => setHighlightedCardId(id)}
-                        moveCard={(oldCardId, newCard) => props.moveCard(oldCardId, newCard)} />
+                        moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
                 )}
                 {displayCard === true &&
                     <div className='card trello-card'>

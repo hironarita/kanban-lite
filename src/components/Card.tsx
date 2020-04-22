@@ -6,7 +6,7 @@ declare interface ICardProps {
     readonly title: string;
     readonly cardId: number;
     readonly columnId: number;
-    readonly moveCard: (cardId: number, newCard: CardModel) => void;
+    readonly moveCard: (cardId: number, newCard: CardModel, columnId: number) => void;
 
     /** determines which card is being hovered over */
     readonly highlightedCardId: number;
@@ -19,6 +19,7 @@ declare interface IDraggableCard {
     readonly type: string;
     readonly title: string;
     readonly cardId: number;
+    readonly columnId: number;
 }
 
 export function Card(props: ICardProps) {
@@ -29,7 +30,7 @@ export function Card(props: ICardProps) {
     const [displayDroppableCardBelow, setDisplayDroppableCardBelow] = useState(false);
 
     const [, drag] = useDrag({
-        item: { type: 'card', title: props.title, cardId: props.cardId },
+        item: { type: 'card', title: props.title, cardId: props.cardId, columnId: props.columnId },
         collect: monitor => {
             if (monitor.isDragging()) setIsDragging(true)
             else {
@@ -47,7 +48,7 @@ export function Card(props: ICardProps) {
                 ? props.columnIndex
                 : props.columnIndex + 1;
             const newCard = new CardModel(item.cardId, item.title, props.columnId, colIndex);
-            props.moveCard(item.cardId, newCard);
+            props.moveCard(item.cardId, newCard, item.columnId);
         },
         hover: (_item, monitor) => {
             if (monitor.isOver()) props.setHighlightedCardId(props.cardId);
