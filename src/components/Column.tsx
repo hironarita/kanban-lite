@@ -14,6 +14,7 @@ declare interface IColumnProps {
 
 export function Column(props: IColumnProps) {
     let textarea = useRef<any>(null);
+    const ref = useRef(null);
 
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
@@ -57,7 +58,7 @@ export function Column(props: IColumnProps) {
     };
 
     return (
-        <div className='column'>
+        <div ref={ref} className='column'>
             <div className='mb-2'>
                 <TextareaAutosize
                     type='text'
@@ -72,7 +73,7 @@ export function Column(props: IColumnProps) {
                 <Card
                     key={i}
                     title={x.Title}
-                    cardId={x.CardId}
+                    cardId={x.Id}
                     columnId={props.columnId}
                     columnIndex={x.ColumnIndex}
                     highlightedCardId={highlightedCardId}

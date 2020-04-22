@@ -19,7 +19,6 @@ declare interface IDraggableCard {
     readonly type: string;
     readonly title: string;
     readonly cardId: number;
-    readonly columnId: number;
 }
 
 export function Card(props: ICardProps) {
@@ -30,7 +29,7 @@ export function Card(props: ICardProps) {
     const [displayDroppableCardBelow, setDisplayDroppableCardBelow] = useState(false);
 
     const [, drag] = useDrag({
-        item: { type: 'card', title: props.title, cardId: props.cardId, columnId: props.columnId },
+        item: { type: 'card', title: props.title, cardId: props.cardId },
         collect: monitor => {
             if (monitor.isDragging()) setIsDragging(true)
             else {

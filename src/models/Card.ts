@@ -1,11 +1,11 @@
 export class CardModel {
-    readonly CardId: number;
+    readonly Id: number;
     readonly Title: string;
     readonly ColumnId: number;
     readonly ColumnIndex: number;
 
-    constructor(cardId: number, title: string, columnId: number, columnIndex: number) {
-        this.CardId = cardId;
+    constructor(id: number, title: string, columnId: number, columnIndex: number) {
+        this.Id = id;
         this.Title = title;
         this.ColumnId = columnId;
         this.ColumnIndex = columnIndex;
