@@ -10,6 +10,7 @@ function App() {
 	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
 	const initialColumn = new ColumnModel(Date.now(), '', 0);
 	const [columns, setColumns] = useState<ReadonlyArray<ColumnModel>>([initialColumn]);
+	const [highlightedColumnId, sethighlightedColumnId] = useState(0);
 
 	const setParentCards = (title: string, columnId: number, cardId: number, columnIndex: number) => {
 		const card = new CardModel(cardId, title, columnId, columnIndex);
@@ -48,8 +49,11 @@ function App() {
 					<div key={x.Id}>
 						<Column
 							columnId={x.Id}
-							setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
+							boardIndex={x.BoardIndex}
+							highlightedColumnId={highlightedColumnId}
 							cards={cards}
+							setHighlightedColumnId={(id) => sethighlightedColumnId(id)}
+							setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 							moveCard={(oldCardId: number, newCard: CardModel) => moveCard(oldCardId, newCard)}
 							moveColumn={(oldColumnId: number, newColumn: ColumnModel) => moveColumn(oldColumnId, newColumn)} />
 					</div>				

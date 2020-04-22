@@ -57,3 +57,7 @@ body {
 .add-column-button {
     margin-left: 20px;
 }
+
+.droppable-column {
+    opacity: 0.5;
+}
