@@ -5,8 +5,6 @@ import { Card } from './Card';
 import { CardModel } from '../models/Card';
 import { ColumnModel } from '../models/Column';
 
-let columnIndex = 0;
-
 declare interface IColumnProps {
     readonly columnId: number;
     readonly boardIndex: number;
@@ -37,6 +35,7 @@ export function Column(props: IColumnProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableLeftColumn, setDisplayDroppableLeftColumn] = useState(false);
     const [displayDroppableRightColumn, setDisplayDroppableRightColumn] = useState(false);
+    const [columnIndex, setColumnIndex] = useState(0);
 
     const filteredCards = useMemo(() => props.cards
         .filter(x => x.ColumnId === props.columnId)
@@ -60,7 +59,7 @@ export function Column(props: IColumnProps) {
             const boardIndex = displayDroppableLeftColumn === true
                 ? props.boardIndex
                 : props.boardIndex + 1;
-            const newColumn = new ColumnModel(Date.now(), item.title, boardIndex);
+            const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
             props.moveColumn(item.columnId, newColumn);
         },
         hover: (_item, monitor) => {
@@ -81,7 +80,8 @@ export function Column(props: IColumnProps) {
     const addCard = (title: string) => {
         if (title.length > 0) {
             setCardTitle('');
-            props.setParentCards(title, props.columnId, Date.now(), columnIndex++);
+            props.setParentCards(title, props.columnId, Date.now(), columnIndex);
+            setColumnIndex(columnIndex + 1);
         }
         setDisplayCard(false);
     };
@@ -116,7 +116,7 @@ export function Column(props: IColumnProps) {
 
     return (
         <div ref={ref} className='d-flex'>
-            {displayDroppableLeftColumn === true && <div className='column droppable-column'></div>}
+            {displayDroppableLeftColumn === true && props.highlightedColumnId === props.columnId && <div className='column droppable-column'></div>}
             <div className={'column ' + (isDragging === true ? 'hide' : '')}>
 
                 <div className='mb-2'>
@@ -160,7 +160,7 @@ export function Column(props: IColumnProps) {
                     Add Card
                 </button>
             </div>
-            {displayDroppableRightColumn === true && <div className='column droppable-column'></div>}
+            {displayDroppableRightColumn === true && props.highlightedColumnId === props.columnId && <div className='column droppable-column'></div>}
         </div>
     )
 }

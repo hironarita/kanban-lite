@@ -46,7 +46,7 @@ export function Card(props: ICardProps) {
             const colIndex = displayDroppableCardAbove === true
                 ? props.columnIndex
                 : props.columnIndex + 1;
-            const newCard = new CardModel(Date.now(), item.title, props.columnId, colIndex);
+            const newCard = new CardModel(item.cardId, item.title, props.columnId, colIndex);
             props.moveCard(item.cardId, newCard);
         },
         hover: (_item, monitor) => {

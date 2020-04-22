@@ -22,10 +22,11 @@ function App() {
 
 	const moveCard = (oldCardId: number, newCard: CardModel) => {
 		const clonedCards = cards.slice();
-		clonedCards.splice(newCard.ColumnIndex, 0, newCard);
-		const newCards = clonedCards
+		const filteredCards = clonedCards
 			.filter(x => x.Id !== oldCardId)
-			.map((x, i) => new CardModel(x.Id, x.Title, x.ColumnId, i));
+			.filter(x => x.ColumnId === newCard.ColumnId);
+		filteredCards.splice(newCard.ColumnIndex, 0, newCard);
+		const newCards = filteredCards.map((x, i) => new CardModel(x.Id, x.Title, x.ColumnId, i));
 		setCards(newCards);
 	};
 
@@ -45,12 +46,14 @@ function App() {
 
 	const moveColumn = (oldColumnId: number, newColumn: ColumnModel) => {
 		const clonedColumns = columns.slice();
-		clonedColumns.splice(newColumn.BoardIndex, 0, newColumn);
-		const newColumns = clonedColumns
-			.filter(x => x.Id !== oldColumnId)
-			.map((x, i) => new ColumnModel(Date.now(), x.Title, i));
+		const filteredColumns = clonedColumns.filter(x => x.Id !== oldColumnId)
+		filteredColumns.splice(newColumn.BoardIndex, 0, newColumn);
+		const newColumns = filteredColumns.map((x, i) => new ColumnModel(x.Id, x.Title, i));
 		setColumns(newColumns);
 	};
+
+	console.log('cards', cards);
+	console.log('columns', columns);
 
 	return (
 		<DndProvider backend={Backend}>
