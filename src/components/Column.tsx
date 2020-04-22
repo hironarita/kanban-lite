@@ -11,7 +11,9 @@ declare interface IColumnProps {
     readonly columnId: number;
     readonly boardIndex: number;
     readonly highlightedColumnId: number;
+    readonly title: string;
     readonly cards: ReadonlyArray<CardModel>;
+    readonly changeColumnTitle: (columnId: number, newTitle: string, boardIndex: number) => void;
     readonly setHighlightedColumnId: (id: number) => void;
     readonly setParentCards: (title: string, columnId: number, cardId: number, columnIndex: number) => void;
     readonly moveCard: (cardId: number, newCard: CardModel) => void;
@@ -22,7 +24,6 @@ declare interface IDraggableColumn {
     readonly type: string;
     readonly title: string;
     readonly columnId: number;
-    readonly boardIndex: number;
 }
 
 export function Column(props: IColumnProps) {
@@ -32,7 +33,7 @@ export function Column(props: IColumnProps) {
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
     const [highlightedCardId, setHighlightedCardId] = useState(0);
-    const [columnTitle, setColumnTitle] = useState('');
+    const [columnTitle, setColumnTitle] = useState(props.title);
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableLeftColumn, setDisplayDroppableLeftColumn] = useState(false);
     const [displayDroppableRightColumn, setDisplayDroppableRightColumn] = useState(false);
@@ -42,7 +43,7 @@ export function Column(props: IColumnProps) {
         .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
 
     const [, drag] = useDrag({
-        item: { type: 'column', title: columnTitle, columnId: props.columnId, boardIndex: props.boardIndex },
+        item: { type: 'column', title: columnTitle, columnId: props.columnId },
         collect: monitor => {
             if (monitor.isDragging()) setIsDragging(true)
             else {
@@ -59,7 +60,7 @@ export function Column(props: IColumnProps) {
             const boardIndex = displayDroppableLeftColumn === true
                 ? props.boardIndex
                 : props.boardIndex + 1;
-            const newColumn = new ColumnModel(Date.now(), columnTitle, boardIndex);
+            const newColumn = new ColumnModel(Date.now(), item.title, boardIndex);
             props.moveColumn(item.columnId, newColumn);
         },
         hover: (_item, monitor) => {
@@ -67,12 +68,12 @@ export function Column(props: IColumnProps) {
 
             const initialOffset = monitor.getInitialClientOffset();
             if (monitor.getClientOffset()!.x < initialOffset!.x) {
-                setDisplayDroppableRightColumn(true);
-                setDisplayDroppableLeftColumn(false);
-            }
-            if (monitor.getClientOffset()!.x > initialOffset!.x) {
                 setDisplayDroppableLeftColumn(true);
                 setDisplayDroppableRightColumn(false);
+            }
+            if (monitor.getClientOffset()!.x > initialOffset!.x) {
+                setDisplayDroppableRightColumn(true);
+                setDisplayDroppableLeftColumn(false);
             }
         }
     })
@@ -87,6 +88,7 @@ export function Column(props: IColumnProps) {
 
     const handleOnChange = (title: string) => {
         setColumnTitle(title);
+        props.changeColumnTitle(props.columnId, title, props.boardIndex);
     };
 
     const handleKeyDown = (key: string) => {
@@ -156,7 +158,7 @@ export function Column(props: IColumnProps) {
                     className='btn btn-success mt-2'
                     onClick={() => { if (displayCard === false) setDisplayCard(true) }}>
                     Add Card
-            </button>
+                </button>
             </div>
             {displayDroppableRightColumn === true && <div className='column droppable-column'></div>}
         </div>

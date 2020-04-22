@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
 import { Column } from './components/Column';
 import { CardModel } from './models/Card';
 import { ColumnModel } from './models/Column';
 
-
 function App() {
 	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
 	const initialColumn = new ColumnModel(Date.now(), '', 0);
 	const [columns, setColumns] = useState<ReadonlyArray<ColumnModel>>([initialColumn]);
 	const [highlightedColumnId, sethighlightedColumnId] = useState(0);
+
+	const sortedColumns = useMemo(() => columns
+		.slice()
+		.sort((x, y) => x.BoardIndex > y.BoardIndex ? 1 : -1), [columns]);
 
 	const setParentCards = (title: string, columnId: number, cardId: number, columnIndex: number) => {
 		const card = new CardModel(cardId, title, columnId, columnIndex);
@@ -33,6 +36,13 @@ function App() {
 		setColumns(clonedColumns);
 	};
 
+	const changeColumnTitle = (columnId: number, newTitle: string, boardIndex: number) => {
+		const clonedColumns = columns.slice();
+		const filtered = clonedColumns.filter(x => x.Id !== columnId);
+		const newColumn = new ColumnModel(columnId, newTitle, boardIndex);
+		setColumns(filtered.concat([newColumn]));
+	};
+
 	const moveColumn = (oldColumnId: number, newColumn: ColumnModel) => {
 		const clonedColumns = columns.slice();
 		clonedColumns.splice(newColumn.BoardIndex, 0, newColumn);
@@ -45,13 +55,15 @@ function App() {
 	return (
 		<DndProvider backend={Backend}>
 			<div className='trello-container'>
-				{columns.map((x, i) => 
+				{sortedColumns.map((x, i) => 
 					<div key={x.Id}>
 						<Column
 							columnId={x.Id}
 							boardIndex={x.BoardIndex}
 							highlightedColumnId={highlightedColumnId}
+							title={x.Title}
 							cards={cards}
+							changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}
 							setHighlightedColumnId={(id) => sethighlightedColumnId(id)}
 							setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 							moveCard={(oldCardId: number, newCard: CardModel) => moveCard(oldCardId, newCard)}
