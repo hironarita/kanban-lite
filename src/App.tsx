@@ -89,7 +89,7 @@ function App() {
 						<button
 							type='button'
 							onClick={() => addColumn()}
-							className='btn btn-secondary add-column-button'>
+							className='btn add-column-button'>
 							+ Add another list
 						</button>
 					</div>

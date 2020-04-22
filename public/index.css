@@ -8,7 +8,7 @@
 }
 
 body {
-    background-color: #3F88C5;
+    background-color: #247ba0;
     color: #393E41;
 }
 
@@ -30,7 +30,7 @@ body {
 
 .column {
     width: 300px;
-    background-color: #F6F7EB;
+    background-color: #f3ffbd;
     border-radius: 2px;
     padding: 10px 10px 10px 10px;
     margin-left: 20px;
@@ -76,8 +76,15 @@ body {
 
 .add-column-button {
     margin-left: 20px;
+    background-color: #70c1b3;
+    color: white;
 }
 
 .droppable-column {
     opacity: 0.5;
+}
+
+.add-card-button {
+    background-color: #70c1b3;
+    color: white;
 }

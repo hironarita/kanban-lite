@@ -161,9 +161,9 @@ export function Column(props: IColumnProps) {
                 }
                 <button
                     type='button'
-                    className='btn btn-success mt-2'
+                    className='btn add-card-button mt-2'
                     onClick={() => { if (displayCard === false) setDisplayCard(true) }}>
-                    Add Card
+                    + Add a card
                 </button>
             </div>
             {displayDroppableRightColumn === true && props.highlightedColumnId === props.columnId && <div className='column droppable-column'></div>}
