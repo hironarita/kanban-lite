@@ -37,7 +37,15 @@ body {
     border-radius: 2px;
     padding: 10px 10px 10px 10px;
     margin-left: 20px;
-    height: 100%;
+}
+
+.placeholder-column {
+    width: 300px;
+    background-color: #f3ffbd;
+    border-radius: 2px;
+    padding: 10px 10px 10px 10px;
+    margin-left: 20px;
+    opacity: .5;
 }
 
 .trello-card {
@@ -91,4 +99,9 @@ body {
 .add-card-button {
     background-color: #70c1b3;
     color: white;
+}
+
+.invisible-column {
+    background-color: transparent;
+    width: 300px;
 }

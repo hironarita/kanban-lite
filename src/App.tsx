@@ -11,10 +11,13 @@ function App() {
 	const [columns, setColumns] = useState<ReadonlyArray<ColumnModel>>([toDoColumn]);
 	const [highlightedColumnId, sethighlightedColumnId] = useState(0);
 	const [columnIdToHeightMap, setColumnIdToHeightMap] = useState(new Map<number, number>());
+	const [dragColumnId, setDragColumnId] = useState(0);
 
 	const sortedColumns = useMemo(() => columns
 		.slice()
 		.sort((x, y) => x.BoardIndex > y.BoardIndex ? 1 : -1), [columns]);
+	
+	const dragColumnHeight = useMemo(() => columnIdToHeightMap.get(dragColumnId)!, [columnIdToHeightMap, dragColumnId]);
 
 	const setParentCards = (title: string, columnId: number, cardId: number, columnIndex: number) => {
 		const card = new CardModel(cardId, title, columnId, columnIndex);
@@ -84,7 +87,10 @@ function App() {
 								highlightedColumnId={highlightedColumnId}
 								title={x.Title}
 								cardCount={cards.filter(y => y.ColumnId === x.Id).length}
+								dragColumnId={dragColumnId}
+								dragColumnHeight={dragColumnHeight}
 								cards={cards}
+								setDragColumnId={(columnId: number) => setDragColumnId(columnId)}
 								setDragColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
 								changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}
 								setHighlightedColumnId={(id: number) => sethighlightedColumnId(id)}

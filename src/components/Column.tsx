@@ -14,7 +14,10 @@ declare interface IColumnProps {
 
     readonly title: string;
     readonly cardCount: number;
+    readonly dragColumnId: number;
+    readonly dragColumnHeight: number;
     readonly cards: ReadonlyArray<CardModel>;
+    readonly setDragColumnId: (columnId: number) => void;
     readonly setDragColumnHeight: (columnId: number, height: number) => void;
     readonly changeColumnTitle: (columnId: number, newTitle: string, boardIndex: number) => void;
     readonly setHighlightedColumnId: (id: number) => void;
@@ -31,7 +34,8 @@ declare interface IDraggableColumn {
 
 export function Column(props: IColumnProps) {
     let textarea = useRef<any>(null);
-    const ref = useRef<any>(null);
+    const ref = useRef(null);
+    const columnRef = useRef<any>(null);
 
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
@@ -41,10 +45,15 @@ export function Column(props: IColumnProps) {
     const [displayDroppableLeftColumn, setDisplayDroppableLeftColumn] = useState(false);
     const [displayDroppableRightColumn, setDisplayDroppableRightColumn] = useState(false);
     const [columnIndex, setColumnIndex] = useState(props.cardCount);
+    const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
 
     useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
-    useEffect(() => props.setDragColumnHeight(props.columnId, ref.current.clientHeight), [props.cards]);
+    useEffect(() => {
+        props.setDragColumnHeight(props.columnId, columnRef.current.clientHeight);
+        const difference = window.innerHeight - document.getElementById(props.columnId.toString())!.getBoundingClientRect().bottom;
+        setInvisibleColumnHeight(difference);
+    }, [props.cards, props.columnId]);
 
     const filteredCards = useMemo(() => props.cards
         .filter(x => x.ColumnId === props.columnId)
@@ -62,6 +71,10 @@ export function Column(props: IColumnProps) {
                 setDisplayDroppableRightColumn(false);
             }
         },
+        begin: () => {
+            props.setHighlightedColumnId(props.columnId);
+            props.setDragColumnId(props.columnId);
+        }
     });
 
     const [, drop] = useDrop({
@@ -131,57 +144,68 @@ export function Column(props: IColumnProps) {
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
 
-    return (
-        <div ref={ref} className='d-flex'>
-            {displayDroppableLeftColumn === true && props.highlightedColumnId === props.columnId &&
-                <div className='column droppable-column'></div>
-            }
-            <div className={'column ' + (isDragging === true ? 'hide' : '')}>
+    console.log('highlighted', props.highlightedColumnId);
+    console.log('dragId', props.dragColumnId)
 
-                <div className='mb-2'>
-                    <TextareaAutosize
-                        type='text'
-                        inputRef={textarea}
-                        className='column-title'
-                        value={columnTitle}
-                        placeholder='Enter list title...'
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
-                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)} />
-                </div>
-                {filteredCards.length === 0 && <div className=''></div>}
-                {filteredCards.map((x, i) =>
-                    <Card
-                        key={i}
-                        title={x.Title}
-                        cardId={x.Id}
-                        columnId={props.columnId}
-                        columnIndex={x.ColumnIndex}
-                        highlightedCardId={highlightedCardId}
-                        setHighlightedCardId={(id) => setHighlightedCardId(id)}
-                        moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
-                )}
-                {displayCard === true &&
-                    <div className='card trello-card'>
-                        <TextareaAutosize
-                            type='text'
-                            autoFocus
-                            className='card-input'
-                            value={cardTitle}
-                            placeholder='Enter a title for this card...'
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChangeForCard(e.target.value)}
-                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDownForCard(e.key)}
-                            onBlur={() => handleOnBlurForCard()} />
+    return (
+        <div ref={ref} id={props.columnId.toString()} className='d-flex'>
+            {displayDroppableLeftColumn === true && props.highlightedColumnId === props.columnId && isDragging === false &&
+                <div style={{ height: props.dragColumnHeight }} className='column droppable-column'></div>
+            }
+            <div>
+                {isDragging === false &&
+                    <div>
+                        <div ref={columnRef} className='column'>
+                            <div className='mb-2'>
+                                <TextareaAutosize
+                                    type='text'
+                                    inputRef={textarea}
+                                    className='column-title'
+                                    value={columnTitle}
+                                    placeholder='Enter list title...'
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
+                                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)} />
+                            </div>
+                            {filteredCards.length === 0 && <div className=''></div>}
+                            {filteredCards.map((x, i) =>
+                                <Card
+                                    key={i}
+                                    title={x.Title}
+                                    cardId={x.Id}
+                                    columnId={props.columnId}
+                                    columnIndex={x.ColumnIndex}
+                                    highlightedCardId={highlightedCardId}
+                                    setHighlightedCardId={(id) => setHighlightedCardId(id)}
+                                    moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
+                            )}
+                            {displayCard === true &&
+                                <div className='card trello-card'>
+                                    <TextareaAutosize
+                                        type='text'
+                                        autoFocus
+                                        className='card-input'
+                                        value={cardTitle}
+                                        placeholder='Enter a title for this card...'
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChangeForCard(e.target.value)}
+                                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDownForCard(e.key)}
+                                        onBlur={() => handleOnBlurForCard()} />
+                                </div>
+                            }
+                            <button
+                                type='button'
+                                className='btn add-card-button mt-2'
+                                onClick={() => { if (displayCard === false) setDisplayCard(true) }}>
+                                + Add a card
+                            </button>
+                        </div>
                     </div>
                 }
-                <button
-                    type='button'
-                    className='btn add-card-button mt-2'
-                    onClick={() => { if (displayCard === false) setDisplayCard(true) }}>
-                    + Add a card
-                </button>
+                {isDragging === true && props.highlightedColumnId === props.dragColumnId &&
+                    <div style={{ height: props.dragColumnHeight }} className='placeholder-column'></div>
+                }
             </div>
-            {displayDroppableRightColumn === true && props.highlightedColumnId === props.columnId &&
-                <div className='column droppable-column'></div>
+            {displayDroppableRightColumn === true && props.highlightedColumnId === props.columnId && isDragging === false &&
+                <div style={{ height: props.dragColumnHeight }} className='column droppable-column'></div>
             }
         </div>
     )
