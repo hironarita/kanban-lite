@@ -13,9 +13,9 @@ function App() {
 	const [columnIdToHeightMap, setColumnIdToHeightMap] = useState(new Map<number, number>());
 	const [dragColumnId, setDragColumnId] = useState(0);
 
-	const sortedColumns = useMemo(() => columns
+	const sortedColumns = columns
 		.slice()
-		.sort((x, y) => x.BoardIndex > y.BoardIndex ? 1 : -1), [columns]);
+		.sort((x, y) => x.BoardIndex > y.BoardIndex ? 1 : -1);
 	
 	const dragColumnHeight = useMemo(() => columnIdToHeightMap.get(dragColumnId)!, [columnIdToHeightMap, dragColumnId]);
 
@@ -72,7 +72,7 @@ function App() {
 		const clone = new Map(columnIdToHeightMap);
 		clone.set(columnId, height);
 		setColumnIdToHeightMap(clone);
-	}, [columnIdToHeightMap, setColumnIdToHeightMap]);
+	}, [columnIdToHeightMap]);
 
 	return (
 		<div>
@@ -91,7 +91,7 @@ function App() {
 								dragColumnHeight={dragColumnHeight}
 								cards={cards}
 								setDragColumnId={(columnId: number) => setDragColumnId(columnId)}
-								setDragColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
+								setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
 								changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}
 								setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
 								setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}

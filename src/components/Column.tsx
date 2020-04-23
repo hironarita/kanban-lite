@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { Card } from './Card';
@@ -18,7 +18,7 @@ declare interface IColumnProps {
     readonly dragColumnHeight: number;
     readonly cards: ReadonlyArray<CardModel>;
     readonly setDragColumnId: (columnId: number) => void;
-    readonly setDragColumnHeight: (columnId: number, height: number) => void;
+    readonly setColumnHeight: (columnId: number, height: number) => void;
     readonly changeColumnTitle: (columnId: number, newTitle: string, boardIndex: number) => void;
     readonly setHighlightedColumnId: (id: number) => void;
     readonly setParentCards: (title: string, columnId: number, cardId: number, columnIndex: number) => void;
@@ -36,7 +36,7 @@ export function Column(props: IColumnProps) {
     let textarea = useRef<any>(null);
     const ref = useRef(null);
     const columnRef = useRef<any>(null);
-    const latestSetDragColumnHeight = useRef(props.setDragColumnHeight);
+    const latestSetColumnHeight = useRef(props.setColumnHeight);
 
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
@@ -47,26 +47,30 @@ export function Column(props: IColumnProps) {
     const [displayDroppableRightColumn, setDisplayDroppableRightColumn] = useState(false);
     const [columnIndex, setColumnIndex] = useState(props.cardCount);
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
+    const [cardIdToHeightMap, setCardIdToHeightMap] = useState(new Map<number, number>());
+    const [dragCardId, setDragCardId] = useState(0);
 
     const columnIdAsString = props.columnId.toString();
 
-    useEffect(() => { latestSetDragColumnHeight.current = props.setDragColumnHeight });
+    const dragCardHeight = useMemo(() => cardIdToHeightMap.get(dragCardId)!, [cardIdToHeightMap, dragCardId]);
+
+    useEffect(() => { latestSetColumnHeight.current = props.setColumnHeight });
 
     useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
-    const filteredCards = useMemo(() => props.cards
-        .filter(x => x.ColumnId === props.columnId)
-        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
-
-    useEffect(() => {  
+    useEffect(() => {
         const difference = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 30;
         const finalHeight = displayCard === true ? difference - 20 : difference;
         setInvisibleColumnHeight(finalHeight);
     }, [props.columnId, displayCard, columnIdAsString]);
 
+    const filteredCards = useMemo(() => props.cards
+        .filter(x => x.ColumnId === props.columnId)
+        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
+
     useEffect(() => {
         const columnHeight = columnRef.current.clientHeight;
-        latestSetDragColumnHeight.current(props.columnId, filteredCards.length === 0 ? columnHeight + 10 : columnHeight);
+        latestSetColumnHeight.current(props.columnId, filteredCards.length === 0 ? columnHeight + 10 : columnHeight);
     }, [filteredCards, props.columnId]);
 
     const [, drag] = useDrag({
@@ -89,11 +93,13 @@ export function Column(props: IColumnProps) {
     const [, drop] = useDrop({
         accept: ['column', 'card'],
         drop: (item: IDraggableColumn) => {
-            const boardIndex = displayDroppableLeftColumn === true
-                ? props.boardIndex
-                : props.boardIndex + 1;
-            const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
-            props.moveColumn(item.columnId, newColumn);
+            if (item.type === 'column') {
+                const boardIndex = displayDroppableLeftColumn === true
+                    ? props.boardIndex
+                    : props.boardIndex + 1;
+                const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
+                props.moveColumn(item.columnId, newColumn);
+            }
         },
         hover: (item, monitor) => {
             if (item.type === 'column') {
@@ -150,8 +156,16 @@ export function Column(props: IColumnProps) {
         setCardTitle(title);
     };
 
+    const setCardHeight = useCallback((cardId: number, height: number) => {
+		const clone = new Map(cardIdToHeightMap);
+		clone.set(cardId, height);
+		setCardIdToHeightMap(clone);
+	}, [cardIdToHeightMap]);
+
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
+
+    console.log(cardIdToHeightMap)
 
     return (
         <div ref={ref} className='d-flex'>
@@ -181,6 +195,10 @@ export function Column(props: IColumnProps) {
                                     columnId={props.columnId}
                                     columnIndex={x.ColumnIndex}
                                     highlightedCardId={highlightedCardId}
+                                    dragCardHeight={dragCardHeight}
+                                    dragCardId={dragCardId}
+                                    setDragCardId={(cardId: number) => setDragCardId(cardId)}
+                                    setCardHeight={(cardId: number, height: number) => setCardHeight(cardId, height)}
                                     setHighlightedCardId={(id) => setHighlightedCardId(id)}
                                     moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
                             )}
