@@ -7,9 +7,10 @@ import { ColumnModel } from './models/Column';
 
 function App() {
 	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
-	const initialColumn = new ColumnModel(Date.now(), '', 0);
-	const [columns, setColumns] = useState<ReadonlyArray<ColumnModel>>([initialColumn]);
+	const toDoColumn = new ColumnModel(Date.now(), 'To Do', 0);
+	const [columns, setColumns] = useState<ReadonlyArray<ColumnModel>>([toDoColumn]);
 	const [highlightedColumnId, sethighlightedColumnId] = useState(0);
+	const [columnIdToHeightMap, setColumnIdToHeightMap] = useState(new Map<number, number>());
 
 	const sortedColumns = useMemo(() => columns
 		.slice()
@@ -64,6 +65,12 @@ function App() {
 		setColumns(newColumns);
 	};
 
+	const setColumnHeight = (columnId: number, height: number) => {
+		const clone = new Map(columnIdToHeightMap);
+		clone.set(columnId, height);
+		setColumnIdToHeightMap(clone);
+	};
+
 	return (
 		<div>
 			<h1 className='logo'>Kanban Lite</h1>
@@ -78,8 +85,9 @@ function App() {
 								title={x.Title}
 								cardCount={cards.filter(y => y.ColumnId === x.Id).length}
 								cards={cards}
+								setDragColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
 								changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}
-								setHighlightedColumnId={(id) => sethighlightedColumnId(id)}
+								setHighlightedColumnId={(id: number) => sethighlightedColumnId(id)}
 								setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 								moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
 								moveColumn={(oldColumnId: number, newColumn: ColumnModel) => moveColumn(oldColumnId, newColumn)} />
