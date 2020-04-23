@@ -36,6 +36,7 @@ export function Column(props: IColumnProps) {
     let textarea = useRef<any>(null);
     const ref = useRef(null);
     const columnRef = useRef<any>(null);
+    const latestSetDragColumnHeight = useRef(props.setDragColumnHeight);
 
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
@@ -47,18 +48,26 @@ export function Column(props: IColumnProps) {
     const [columnIndex, setColumnIndex] = useState(props.cardCount);
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
 
-    useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
+    const columnIdAsString = props.columnId.toString();
 
-    useEffect(() => {
-        props.setDragColumnHeight(props.columnId, columnRef.current.clientHeight);
-        const difference = window.innerHeight - document.getElementById(props.columnId.toString())!.getBoundingClientRect().bottom;
-        setInvisibleColumnHeight(difference);
-    }, [props.cards, props.columnId]);
+    useEffect(() => { latestSetDragColumnHeight.current = props.setDragColumnHeight });
+
+    useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
     const filteredCards = useMemo(() => props.cards
         .filter(x => x.ColumnId === props.columnId)
         .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
 
+    useEffect(() => {  
+        const difference = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 30;
+        const finalHeight = displayCard === true ? difference - 20 : difference;
+        setInvisibleColumnHeight(finalHeight);
+    }, [props.columnId, displayCard, columnIdAsString]);
+
+    useEffect(() => {
+        const columnHeight = columnRef.current.clientHeight;
+        latestSetDragColumnHeight.current(props.columnId, filteredCards.length === 0 ? columnHeight + 10 : columnHeight);
+    }, [filteredCards, props.columnId]);
 
     const [, drag] = useDrag({
         item: { type: 'column', title: columnTitle, columnId: props.columnId },
@@ -144,18 +153,15 @@ export function Column(props: IColumnProps) {
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
 
-    console.log('highlighted', props.highlightedColumnId);
-    console.log('dragId', props.dragColumnId)
-
     return (
-        <div ref={ref} id={props.columnId.toString()} className='d-flex'>
+        <div ref={ref} className='d-flex'>
             {displayDroppableLeftColumn === true && props.highlightedColumnId === props.columnId && isDragging === false &&
                 <div style={{ height: props.dragColumnHeight }} className='column droppable-column'></div>
             }
             <div>
                 {isDragging === false &&
                     <div>
-                        <div ref={columnRef} className='column'>
+                        <div id={columnIdAsString} ref={columnRef} className='column'>
                             <div className='mb-2'>
                                 <TextareaAutosize
                                     type='text'
@@ -198,6 +204,7 @@ export function Column(props: IColumnProps) {
                                 + Add a card
                             </button>
                         </div>
+                        <div style={{ height: invisibleColumnHeight }} className='invisible-column'></div>
                     </div>
                 }
                 {isDragging === true && props.highlightedColumnId === props.dragColumnId &&
