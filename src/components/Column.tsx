@@ -49,6 +49,7 @@ export function Column(props: IColumnProps) {
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
     const [cardIdToHeightMap, setCardIdToHeightMap] = useState(new Map<number, number>());
     const [dragCardId, setDragCardId] = useState(0);
+    const [displayFirstPlaceholderCard, setDisplayFirstPlaceholderCard] = useState(false);
 
     const columnIdAsString = props.columnId.toString();
 
@@ -62,7 +63,7 @@ export function Column(props: IColumnProps) {
         const difference = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 30;
         const finalHeight = displayCard === true ? difference - 20 : difference;
         setInvisibleColumnHeight(finalHeight);
-    }, [props.columnId, displayCard, columnIdAsString]);
+    }, [props.columnId, cardTitle, columnIdAsString, displayCard, displayFirstPlaceholderCard]);
 
     const filteredCards = useMemo(() => props.cards
         .filter(x => x.ColumnId === props.columnId)
@@ -117,7 +118,7 @@ export function Column(props: IColumnProps) {
             }
 
             if (item.type === 'card' && filteredCards.length === 0) {
-
+                setDisplayFirstPlaceholderCard(true);
             }
         }
     })
@@ -165,8 +166,6 @@ export function Column(props: IColumnProps) {
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
 
-    console.log(cardIdToHeightMap)
-
     return (
         <div ref={ref} className='d-flex'>
             {displayDroppableLeftColumn === true && props.highlightedColumnId === props.columnId && isDragging === false &&
@@ -186,7 +185,9 @@ export function Column(props: IColumnProps) {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)} />
                             </div>
-                            {filteredCards.length === 0 && <div className=''></div>}
+                            {filteredCards.length === 0 && displayFirstPlaceholderCard === true &&
+                                <div style={{ height: dragCardHeight }} className='card trello-card placeholder-card'></div>
+                            }
                             {filteredCards.map((x, i) =>
                                 <Card
                                     key={i}
