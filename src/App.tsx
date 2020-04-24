@@ -12,12 +12,16 @@ function App() {
 	const [highlightedColumnId, setHighlightedColumnId] = useState(0);
 	const [columnIdToHeightMap, setColumnIdToHeightMap] = useState(new Map<number, number>());
 	const [dragColumnId, setDragColumnId] = useState(0);
+	const [dragCardId, setDragCardId] = useState(0);
+	const [cardIdToHeightMap, setCardIdToHeightMap] = useState(new Map<number, number>());
 
 	const sortedColumns = columns
 		.slice()
 		.sort((x, y) => x.BoardIndex > y.BoardIndex ? 1 : -1);
 	
 	const dragColumnHeight = useMemo(() => columnIdToHeightMap.get(dragColumnId)!, [columnIdToHeightMap, dragColumnId]);
+
+	const dragCardHeight = useMemo(() => cardIdToHeightMap.get(dragCardId)!, [cardIdToHeightMap, dragCardId]);
 
 	const setParentCards = (title: string, columnId: number, cardId: number, columnIndex: number) => {
 		const card = new CardModel(cardId, title, columnId, columnIndex);
@@ -74,6 +78,12 @@ function App() {
 		setColumnIdToHeightMap(clone);
 	}, [columnIdToHeightMap]);
 
+	const setCardHeight = useCallback((cardId: number, height: number) => {
+		const clone = new Map(cardIdToHeightMap);
+		clone.set(cardId, height);
+		setCardIdToHeightMap(clone);
+	}, [cardIdToHeightMap]);
+
 	return (
 		<div>
 			<h1 className='logo'>Kanban Lite</h1>
@@ -89,7 +99,11 @@ function App() {
 								cardCount={cards.filter(y => y.ColumnId === x.Id).length}
 								dragColumnId={dragColumnId}
 								dragColumnHeight={dragColumnHeight}
+								dragCardId={dragCardId}
+								dragCardHeight={dragCardHeight}
 								cards={cards}
+								setCardHeight={(cardId: number, height: number) => setCardHeight(cardId, height)}
+								setDragCardId={(cardId: number) => setDragCardId(cardId)}
 								setDragColumnId={(columnId: number) => setDragColumnId(columnId)}
 								setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
 								changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}

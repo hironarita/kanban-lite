@@ -16,7 +16,11 @@ declare interface IColumnProps {
     readonly cardCount: number;
     readonly dragColumnId: number;
     readonly dragColumnHeight: number;
+    readonly dragCardId: number;
+    readonly dragCardHeight: number;
     readonly cards: ReadonlyArray<CardModel>;
+    readonly setDragCardId: (cardId: number) => void;
+    readonly setCardHeight: (cardId: number, height: number) => void;
     readonly setDragColumnId: (columnId: number) => void;
     readonly setColumnHeight: (columnId: number, height: number) => void;
     readonly changeColumnTitle: (columnId: number, newTitle: string, boardIndex: number) => void;
@@ -47,13 +51,9 @@ export function Column(props: IColumnProps) {
     const [displayDroppableRightColumn, setDisplayDroppableRightColumn] = useState(false);
     const [columnIndex, setColumnIndex] = useState(props.cardCount);
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
-    const [cardIdToHeightMap, setCardIdToHeightMap] = useState(new Map<number, number>());
-    const [dragCardId, setDragCardId] = useState(0);
     const [displayFirstPlaceholderCard, setDisplayFirstPlaceholderCard] = useState(false);
 
     const columnIdAsString = props.columnId.toString();
-
-    const dragCardHeight = useMemo(() => cardIdToHeightMap.get(dragCardId)!, [cardIdToHeightMap, dragCardId]);
 
     useEffect(() => { latestSetColumnHeight.current = props.setColumnHeight });
 
@@ -157,11 +157,7 @@ export function Column(props: IColumnProps) {
         setCardTitle(title);
     };
 
-    const setCardHeight = useCallback((cardId: number, height: number) => {
-		const clone = new Map(cardIdToHeightMap);
-		clone.set(cardId, height);
-		setCardIdToHeightMap(clone);
-	}, [cardIdToHeightMap]);
+
 
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
@@ -186,7 +182,7 @@ export function Column(props: IColumnProps) {
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)} />
                             </div>
                             {filteredCards.length === 0 && displayFirstPlaceholderCard === true &&
-                                <div style={{ height: dragCardHeight }} className='card trello-card placeholder-card'></div>
+                                <div style={{ height: props.dragCardHeight }} className='card trello-card placeholder-card'></div>
                             }
                             {filteredCards.map((x, i) =>
                                 <Card
@@ -196,10 +192,10 @@ export function Column(props: IColumnProps) {
                                     columnId={props.columnId}
                                     columnIndex={x.ColumnIndex}
                                     highlightedCardId={highlightedCardId}
-                                    dragCardHeight={dragCardHeight}
-                                    dragCardId={dragCardId}
-                                    setDragCardId={(cardId: number) => setDragCardId(cardId)}
-                                    setCardHeight={(cardId: number, height: number) => setCardHeight(cardId, height)}
+                                    dragCardHeight={props.dragCardHeight}
+                                    dragCardId={props.dragCardId}
+                                    setDragCardId={(cardId: number) => props.setDragCardId(cardId)}
+                                    setCardHeight={(cardId: number, height: number) => props.setCardHeight(cardId, height)}
                                     setHighlightedCardId={(id) => setHighlightedCardId(id)}
                                     moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
                             )}
