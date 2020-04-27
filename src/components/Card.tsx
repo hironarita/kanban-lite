@@ -19,7 +19,7 @@ declare interface ICardProps {
     readonly setHighlightedCardId: (cardId: number) => void;
 }
 
-declare interface IDraggableCard {
+export interface IDraggableCard {
     readonly type: string;
     readonly title: string;
     readonly cardId: number;

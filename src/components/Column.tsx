@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
-import { Card } from './Card';
+import { Card, IDraggableCard } from './Card';
 import { CardModel } from '../models/Card';
 import { ColumnModel } from '../models/Column';
 
@@ -83,6 +83,7 @@ export function Column(props: IColumnProps) {
                 setIsDragging(false);
                 setDisplayDroppableLeftColumn(false);
                 setDisplayDroppableRightColumn(false);
+                setDisplayFirstPlaceholderCard(false);
             }
         },
         begin: () => {
@@ -93,7 +94,7 @@ export function Column(props: IColumnProps) {
 
     const [, drop] = useDrop({
         accept: ['column', 'card'],
-        drop: (item: IDraggableColumn) => {
+        drop: (item: IDraggableColumn | IDraggableCard) => {
             if (item.type === 'column') {
                 const boardIndex = displayDroppableLeftColumn === true
                     ? props.boardIndex
@@ -101,6 +102,9 @@ export function Column(props: IColumnProps) {
                 const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
                 props.moveColumn(item.columnId, newColumn);
             }
+        },
+        collect: monitor => {
+            if (monitor.isOver() === false) setDisplayFirstPlaceholderCard(false);
         },
         hover: (item, monitor) => {
             if (item.type === 'column') {
@@ -156,8 +160,6 @@ export function Column(props: IColumnProps) {
     const handleOnChangeForCard = (title: string) => {
         setCardTitle(title);
     };
-
-
 
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
