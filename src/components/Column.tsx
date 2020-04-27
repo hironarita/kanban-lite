@@ -97,14 +97,16 @@ export function Column(props: IColumnProps) {
         drop: (item: IDraggableColumn | IDraggableCard) => {
             if (item.type === 'column') {
                 const boardIndex = displayDroppableLeftColumn === true
-                    ? props.boardIndex
+                    ? props.boardIndex - 1
                     : props.boardIndex + 1;
                 const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
                 props.moveColumn(item.columnId, newColumn);
             }
         },
         collect: monitor => {
-            if (monitor.isOver() === false) setDisplayFirstPlaceholderCard(false);
+            monitor.isOver()
+                ? setHighlightedCardId(0)
+                : setDisplayFirstPlaceholderCard(false);
         },
         hover: (item, monitor) => {
             if (item.type === 'column') {
@@ -121,7 +123,7 @@ export function Column(props: IColumnProps) {
                 }
             }
 
-            if (item.type === 'card' && filteredCards.length === 0) {
+            if (item.type === 'card') {
                 setDisplayFirstPlaceholderCard(true);
             }
         }
@@ -183,7 +185,7 @@ export function Column(props: IColumnProps) {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)} />
                             </div>
-                            {filteredCards.length === 0 && displayFirstPlaceholderCard === true &&
+                            {filteredCards.length <= 1 && displayFirstPlaceholderCard === true &&
                                 <div style={{ height: props.dragCardHeight }} className='card trello-card placeholder-card'></div>
                             }
                             {filteredCards.map((x, i) =>

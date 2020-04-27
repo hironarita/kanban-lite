@@ -64,7 +64,7 @@ export function Card(props: ICardProps) {
         accept: 'card',
         drop: (item: IDraggableCard) => {
             const colIndex = displayDroppableCardAbove === true
-                ? props.columnIndex
+                ? props.columnIndex - 1
                 : props.columnIndex + 1;
             const newCard = new CardModel(item.cardId, item.title, props.columnId, colIndex);
             props.moveCard(item.cardId, newCard, item.columnId);

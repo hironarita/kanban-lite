@@ -84,6 +84,8 @@ function App() {
 		setCardIdToHeightMap(clone);
 	}, [cardIdToHeightMap]);
 
+	console.log(cards)
+
 	return (
 		<div>
 			<h1 className='logo'>Kanban Lite</h1>
