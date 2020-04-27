@@ -18,7 +18,9 @@ declare interface IColumnProps {
     readonly dragColumnHeight: number;
     readonly dragCardId: number;
     readonly dragCardHeight: number;
+    readonly isDragInProgress: boolean;
     readonly cards: ReadonlyArray<CardModel>;
+    readonly setIsDragInProgress: (x: boolean) => void;
     readonly setDragCardId: (cardId: number) => void;
     readonly setCardHeight: (cardId: number, height: number) => void;
     readonly setDragColumnId: (columnId: number) => void;
@@ -59,15 +61,15 @@ export function Column(props: IColumnProps) {
 
     useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
+    const filteredCards = useMemo(() => props.cards
+        .filter(x => x.ColumnId === props.columnId)
+        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
+
     useEffect(() => {
         const difference = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 30;
         const finalHeight = displayCard === true ? difference - 20 : difference;
         setInvisibleColumnHeight(finalHeight);
-    }, [props.columnId, cardTitle, columnIdAsString, displayCard, displayFirstPlaceholderCard]);
-
-    const filteredCards = useMemo(() => props.cards
-        .filter(x => x.ColumnId === props.columnId)
-        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
+    }, [props.columnId, cardTitle, columnIdAsString]);
 
     useEffect(() => {
         const columnHeight = columnRef.current.clientHeight;
@@ -79,8 +81,10 @@ export function Column(props: IColumnProps) {
         collect: monitor => {
             if (monitor.isDragging()) {
                 setIsDragging(true);
+                props.setIsDragInProgress(true);
             } else {
                 setIsDragging(false);
+                props.setIsDragInProgress(false);
                 setDisplayDroppableLeftColumn(false);
                 setDisplayDroppableRightColumn(false);
                 setDisplayFirstPlaceholderCard(false);
@@ -223,7 +227,9 @@ export function Column(props: IColumnProps) {
                                 + Add a card
                             </button>
                         </div>
-                        <div style={{ height: invisibleColumnHeight }} className='invisible-column'></div>
+                        {props.dragColumnId !== props.columnId && props.isDragInProgress === true &&
+                            <div style={{ height: invisibleColumnHeight }} className='invisible-column'></div>
+                        }
                     </div>
                 }
                 {isDragging === true && props.highlightedColumnId === props.dragColumnId &&

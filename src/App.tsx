@@ -14,6 +14,7 @@ function App() {
 	const [dragColumnId, setDragColumnId] = useState(0);
 	const [dragCardId, setDragCardId] = useState(0);
 	const [cardIdToHeightMap, setCardIdToHeightMap] = useState(new Map<number, number>());
+	const [isDragInProgress, setIsDragInProgress] = useState(false);
 
 	const sortedColumns = columns
 		.slice()
@@ -101,7 +102,9 @@ function App() {
 								dragColumnHeight={dragColumnHeight}
 								dragCardId={dragCardId}
 								dragCardHeight={dragCardHeight}
+								isDragInProgress={isDragInProgress}
 								cards={cards}
+								setIsDragInProgress={(x: boolean) => setIsDragInProgress(x)}
 								setCardHeight={(cardId: number, height: number) => setCardHeight(cardId, height)}
 								setDragCardId={(cardId: number) => setDragCardId(cardId)}
 								setDragColumnId={(columnId: number) => setDragColumnId(columnId)}
