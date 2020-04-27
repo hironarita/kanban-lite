@@ -69,7 +69,7 @@ export function Column(props: IColumnProps) {
         const difference = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 30;
         const finalHeight = displayCard === true ? difference - 20 : difference;
         setInvisibleColumnHeight(finalHeight);
-    }, [props.columnId, cardTitle, columnIdAsString]);
+    }, [displayCard, columnIdAsString]);
 
     useEffect(() => {
         const columnHeight = columnRef.current.clientHeight;
@@ -84,7 +84,6 @@ export function Column(props: IColumnProps) {
                 props.setIsDragInProgress(true);
             } else {
                 setIsDragging(false);
-                props.setIsDragInProgress(false);
                 setDisplayDroppableLeftColumn(false);
                 setDisplayDroppableRightColumn(false);
                 setDisplayFirstPlaceholderCard(false);
@@ -93,7 +92,8 @@ export function Column(props: IColumnProps) {
         begin: () => {
             props.setHighlightedColumnId(props.columnId);
             props.setDragColumnId(props.columnId);
-        }
+        },
+        end: () => props.setIsDragInProgress(false)
     });
 
     const [, drop] = useDrop({
