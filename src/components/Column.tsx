@@ -61,20 +61,20 @@ export function Column(props: IColumnProps) {
 
     useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
-    const filteredCards = useMemo(() => props.cards
-        .filter(x => x.ColumnId === props.columnId)
-        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
-
-    useEffect(() => {
+        useEffect(() => {
         const difference = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 30;
         const finalHeight = displayCard === true ? difference - 20 : difference;
         setInvisibleColumnHeight(finalHeight);
     }, [displayCard, columnIdAsString]);
 
+    const filteredCards = useMemo(() => props.cards
+        .filter(x => x.ColumnId === props.columnId)
+        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
+
     useEffect(() => {
         const columnHeight = columnRef.current.clientHeight;
         latestSetColumnHeight.current(props.columnId, filteredCards.length === 0 ? columnHeight + 10 : columnHeight);
-    }, [filteredCards, props.columnId]);
+    }, [filteredCards, props.columnId, displayCard]);
 
     const [, drag] = useDrag({
         item: { type: 'column', title: columnTitle, columnId: props.columnId },
