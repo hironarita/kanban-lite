@@ -106,6 +106,11 @@ export function Column(props: IColumnProps) {
                 const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
                 props.moveColumn(item.columnId, newColumn);
             }
+
+            if (item.type === 'card') {
+                const newCard = new CardModel((item as IDraggableCard).cardId, item.title, props.columnId, 0);
+                props.moveCard((item as IDraggableCard).cardId, newCard, item.columnId);
+            }
         },
         collect: monitor => {
             monitor.isOver()
