@@ -5,8 +5,6 @@ import { useRouteMatch } from 'react-router-dom';
 import { LoginSignup } from './LoginSignup';
 
 export function ModalManager() {
-    const match = useRouteMatch();
-
     const handleClose = () => window.location.href = Path.Home;
 
     const Component = useRouteMatch().path === Path.Login
