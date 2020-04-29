@@ -37,6 +37,7 @@ body {
     border-radius: 2px;
     padding: 10px 10px 10px 10px;
     margin-left: 20px;
+    cursor: pointer;
 }
 
 .placeholder-column {
@@ -51,6 +52,7 @@ body {
 .trello-card {
     padding: 5px;
     margin-bottom: 10px;
+    cursor: pointer;
 }
 
 .card-input {
@@ -108,4 +110,8 @@ body {
 
 .placeholder-card {
     opacity: 0.5;
+}
+
+.login-btn {
+    background-color: #b2dbbf;
 }

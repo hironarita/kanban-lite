@@ -1,9 +1,12 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { Column } from './components/Column';
 import { CardModel } from './models/Card';
 import { ColumnModel } from './models/Column';
+import { ModalManager } from './components/ModalManager';
+import { Path } from './utilities/Enums';
 
 function App() {
 	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
@@ -86,8 +89,13 @@ function App() {
 	}, [cardIdToHeightMap]);
 
 	return (
-		<div>
-			<h1 className='logo'>Kanban Lite</h1>
+		<Router>
+			<div className='d-flex'>
+				<h1 className='logo'>Kanban Lite</h1>				
+				<Link to={Path.Login}>
+					<button type='button' className='btn login-btn' data-toggle="modal" data-target="#exampleModal">Login</button>
+				</Link>			
+			</div>
 			<DndProvider backend={Backend}>
 				<div className='trello-container'>
 					{sortedColumns.map((x, i) => 
@@ -126,7 +134,10 @@ function App() {
 					</div>
 				</div>
 			</DndProvider>
-		</div>
+			<Route path={Path.Login}>
+				<ModalManager />
+			</Route>
+		</Router>
 	);
 }
 
