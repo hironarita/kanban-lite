@@ -90,10 +90,10 @@ function App() {
 
 	return (
 		<Router>
-			<div className='d-flex'>
+			<div className='d-flex align-items-center'>
 				<h1 className='logo'>Kanban Lite</h1>				
 				<Link to={Path.Login}>
-					<button type='button' className='btn login-btn' data-toggle="modal" data-target="#exampleModal">Login</button>
+					<button type='button' className='btn login-btn ml-3 mt-2'>Login</button>
 				</Link>			
 			</div>
 			<DndProvider backend={Backend}>

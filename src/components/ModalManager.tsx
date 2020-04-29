@@ -1,23 +1,24 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
+import { Path } from '../utilities/Enums';
+import { useRouteMatch } from 'react-router-dom';
+import { LoginSignup } from './LoginSignup';
 
 export function ModalManager() {
-    const handleClose = () => console.log('');
+    const match = useRouteMatch();
+
+    const handleClose = () => window.location.href = Path.Home;
+
+    const Component = useRouteMatch().path === Path.Login
+        ? LoginSignup
+        : LoginSignup;
 
     return (
         <Modal show={true} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Modal heading</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={handleClose}>
-                    Save Changes
-                </Button>
-            </Modal.Footer>
+            <Modal.Header closeButton></Modal.Header>
+            <Modal.Body>
+                <Component />
+            </Modal.Body>
         </Modal>
     )
 }
