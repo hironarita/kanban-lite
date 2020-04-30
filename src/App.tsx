@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
@@ -8,7 +8,10 @@ import { ColumnModel } from './models/Column';
 import { ModalManager } from './components/ModalManager';
 import { Path } from './utilities/Enums';
 
-function App() {
+declare interface IAppProps {
+	readonly isLoggedIn: boolean;
+}
+function App(props: IAppProps) {
 	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
 	const toDoColumn = new ColumnModel(Date.now(), 'To Do', 0);
 	const [columns, setColumns] = useState<ReadonlyArray<ColumnModel>>([toDoColumn]);
@@ -22,7 +25,7 @@ function App() {
 	const sortedColumns = columns
 		.slice()
 		.sort((x, y) => x.BoardIndex > y.BoardIndex ? 1 : -1);
-	
+
 	const dragColumnHeight = useMemo(() => columnIdToHeightMap.get(dragColumnId)!, [columnIdToHeightMap, dragColumnId]);
 
 	const dragCardHeight = useMemo(() => cardIdToHeightMap.get(dragCardId)!, [cardIdToHeightMap, dragCardId]);
@@ -91,14 +94,21 @@ function App() {
 	return (
 		<Router>
 			<div className='d-flex align-items-center'>
-				<h1 className='logo'>Kanban Lite</h1>				
-				<Link to={Path.Login}>
-					<button type='button' className='btn login-btn ml-3 mt-2'>Login</button>
-				</Link>			
+				<h1 className='logo'>Kanban Lite</h1>
+				{props.isLoggedIn === false &&
+					<div>
+						<Link to={Path.Login}>
+							<button type='button' className='btn login-btn ml-3 mt-2'>Login</button>
+						</Link>
+						<Link to={Path.Signup}>
+							<button type='button' className='btn login-btn ml-3 mt-2'>Signup</button>
+						</Link>
+					</div>
+				}
 			</div>
 			<DndProvider backend={Backend}>
 				<div className='trello-container'>
-					{sortedColumns.map((x, i) => 
+					{sortedColumns.map((x, i) =>
 						<div key={x.Id}>
 							<Column
 								columnId={x.Id}
@@ -122,7 +132,7 @@ function App() {
 								setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 								moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
 								moveColumn={(oldColumnId: number, newColumn: ColumnModel) => moveColumn(oldColumnId, newColumn)} />
-						</div>				
+						</div>
 					)}
 					<div>
 						<button
@@ -134,7 +144,7 @@ function App() {
 					</div>
 				</div>
 			</DndProvider>
-			<Route path={Path.Login}>
+			<Route path={[Path.Login, Path.Signup]}>
 				<ModalManager />
 			</Route>
 		</Router>

@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useRouteMatch } from 'react-router-dom';
+import { Path } from '../utilities/Enums';
+
+const headers = new Headers();
+headers.append('Content-Type', 'application/json');
+headers.append('Accept', 'application/json');
 
 export function LoginSignup() {
     const [username, setUsername] = useState('');
@@ -7,27 +12,37 @@ export function LoginSignup() {
     // const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const doFetch = (url: string, method = 'GET') => {
-        const headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        headers.append('Accept', 'application/json');
-        headers.append('Cache', 'no-cache');
-        const params = {
-            method, headers,
-            credentials: 'include' // The cookie must be sent!
-        } as any;
-        return fetch(url, params);
-    }
+    const isLoggingIn = useRouteMatch().path === Path.Login;
+
+    const login = async () => {
+        setIsLoading(true);
+        try {      
+            await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                credentials: 'include',
+                headers: headers,
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const register = async () => {
-        const data = {
-            username,
-            password
-        };
         setIsLoading(true);
-        try {
-            await axios.post('http://localhost:5000/login', data)
-            await axios.get('http://localhost:5000/isLoggedIn', { withCredentials: true })
+        try {      
+            await fetch('http://localhost:3000/register', {
+                method: 'POST',
+                credentials: 'include',
+                headers: headers,
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            });
         } finally {
             setIsLoading(false);
         }
@@ -59,7 +74,9 @@ export function LoginSignup() {
                 type='button'
                 className='btn btn-primary'
                 disabled={isLoading}
-                onClick={() => register()}>Submit</button>
+                onClick={() => isLoggingIn === true ? login() : register()}>
+                {isLoggingIn === true ? 'Login' : 'Signup'}
+            </button>
         </form>
     )
 }
