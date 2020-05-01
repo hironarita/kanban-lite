@@ -51,7 +51,7 @@ body {
     text-shadow: -1px -1px 0 #247ba0, 1px -1px 0 #247ba0, -1px 1px 0 #247ba0, 1px 1px 0 #247ba0, 1px 0px 0px #70c1b3, 0px 1px 0px #70c1b3,
         2px 1px 0px #70c1b3, 1px 2px 0px #70c1b3, 3px 2px 0px #70c1b3, 2px 3px 0px #70c1b3, 4px 3px 0px #70c1b3, 3px 4px 0px #70c1b3, 5px 4px 0px #70c1b3,
         3px 5px 0px #247ba0, 6px 5px 0px #247ba0, -1px 2px 0 black, 0 3px 0 #247ba0, 1px 4px 0 #247ba0, 2px 5px 0px #247ba0, 2px -1px 0 #247ba0,
-        3px 0 0 #247ba0, 4px 1px 0 #247ba0, 5px 2px 0px #247ba0, 6px 3px 0 #247ba0, 7px 4px 0 #247ba0, 10px 10px 4px #70c1b3; 
+        3px 0 0 #247ba0, 4px 1px 0 #247ba0, 5px 2px 0px #247ba0, 6px 3px 0 #247ba0, 7px 4px 0 #247ba0, 10px 10px 4px #70c1b3;
 }
 
 .trello-container {
@@ -170,5 +170,38 @@ body {
     background-image: linear-gradient(to left, #74ebd5, #9face6);
     color: white;
     text-transform: uppercase;
-    margin-right: 20px;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.github-corner:hover .octo-arm {
+    animation: octocat-wave 560ms ease-in-out
+}
+
+@keyframes octocat-wave {
+
+    0%,
+    100% {
+        transform: rotate(0)
+    }
+
+    20%,
+    60% {
+        transform: rotate(-25deg)
+    }
+
+    40%,
+    80% {
+        transform: rotate(10deg)
+    }
+}
+
+@media (max-width:500px) {
+    .github-corner:hover .octo-arm {
+        animation: none
+    }
+
+    .github-corner .octo-arm {
+        animation: octocat-wave 560ms ease-in-out
+    }
 }
