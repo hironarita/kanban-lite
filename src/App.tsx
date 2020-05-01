@@ -22,6 +22,7 @@ function App(props: IAppProps) {
 	const [dragCardId, setDragCardId] = useState(0);
 	const [cardIdToHeightMap, setCardIdToHeightMap] = useState(new Map<number, number>());
 	const [isDragInProgress, setIsDragInProgress] = useState(false);
+	const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
 
 	const sortedColumns = columns
 		.slice()
@@ -94,7 +95,7 @@ function App(props: IAppProps) {
 
 	return (
 		<Router>
-			{props.isLoggedIn === true
+			{isLoggedIn === true
 				? <div>
 					<div className='d-flex align-items-center'>
 						<h1 className='logged-in-logo'>Kanban Lite</h1>
@@ -138,7 +139,7 @@ function App(props: IAppProps) {
 						</div>
 					</DndProvider>
 				</div>
-				: <LoginSignup />
+				: <LoginSignup logIn={() => setIsLoggedIn(true)} />
 			}
 			<Route path={Path.Card}>
 				<ModalManager />

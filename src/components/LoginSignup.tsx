@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { useRouteMatch } from 'react-router-dom';
-import { Path } from '../utilities/Enums';
 
 const headers = new Headers();
 headers.append('Content-Type', 'application/json');
 headers.append('Accept', 'application/json');
 
-export function LoginSignup() {
+declare interface ILoginSignupProps {
+    readonly logIn: () => void;
+}
+export function LoginSignup(props: ILoginSignupProps) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    // const [confirmPassword, setConfirmPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
-    const isLoggingIn = useRouteMatch().path === Path.Card;
+    const [isLoggingIn, setIsLogginIn] = useState(false);
 
     const login = async () => {
         setIsLoading(true);
@@ -26,6 +26,7 @@ export function LoginSignup() {
                     password
                 })
             });
+            props.logIn();
         } finally {
             setIsLoading(false);
         }
@@ -43,6 +44,7 @@ export function LoginSignup() {
                     password
                 })
             });
+            props.logIn();
         } finally {
             setIsLoading(false);
         }
@@ -59,7 +61,8 @@ export function LoginSignup() {
                         value={username}
                         onChange={e => setUsername(e.target.value)}
                         id='username'
-                        placeholder='Enter username' />
+                        placeholder='Enter username'
+                        disabled={isLoading === true} />
                 </div>
                 <div className='form-group'>                 
                     <input
@@ -68,28 +71,33 @@ export function LoginSignup() {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         id='password'
-                        placeholder='Password' />
+                        placeholder='Password'
+                        disabled={isLoading === true} />
                 </div>
                 {isLoggingIn === false &&
                     <div className='form-group'>                     
                         <input
                             type='password'
                             className='form-control'
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
+                            value={confirmPassword}
+                            onChange={e => setConfirmPassword(e.target.value)}
                             id='confirmPassword'
-                            placeholder='Confirm password' />
+                            placeholder='Confirm password'
+                            disabled={isLoading === true} />
                     </div>
                 }
                 <button
                     type='button'
-                    className='btn login-btn w-100 mt-3'
+                    className='btn login-btn w-100'
                     disabled={isLoading}
                     onClick={() => isLoggingIn === true ? login() : register()}>
                     {isLoggingIn === true ? 'Log In' : 'Sign Up'}
                 </button>
                 <div className='text-center mt-5'>
-                    <span className='login-question-text'>Already have an account? Log in here</span>
+                    {isLoggingIn === true
+                        ? <span className='login-question-text'>Don't have an account? <span className='login-link' onClick={() => setIsLogginIn(false)}>Sign up here</span></span>
+                        : <span className='login-question-text'>Already have an account? <span className='login-link' onClick={() => setIsLogginIn(true)}>Log in here</span></span>
+                    }                  
                 </div>
             </form>
         </div>

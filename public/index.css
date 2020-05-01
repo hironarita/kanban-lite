@@ -158,3 +158,8 @@ body {
 .login-signup-form {
     width: 400px;
 }
+
+.login-link {
+    text-decoration: underline;
+    cursor: pointer;
+}
