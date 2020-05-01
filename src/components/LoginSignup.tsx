@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const headers = new Headers();
 headers.append('Content-Type', 'application/json');
@@ -14,18 +15,13 @@ export function LoginSignup(props: ILoginSignupProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggingIn, setIsLogginIn] = useState(false);
 
+    // cleanup
+    useEffect(() => { return () => setIsLoading(false) }, [isLoading]);
+
     const login = async () => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/login', {
-                method: 'POST',
-                credentials: 'include',
-                headers: headers,
-                body: JSON.stringify({
-                    username,
-                    password
-                })
-            });
+            await axios.post('http://localhost:3000/account/login', { username, password }, { withCredentials: true })
             props.logIn();
         } finally {
             setIsLoading(false);
@@ -35,15 +31,7 @@ export function LoginSignup(props: ILoginSignupProps) {
     const register = async () => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/register', {
-                method: 'POST',
-                credentials: 'include',
-                headers: headers,
-                body: JSON.stringify({
-                    username,
-                    password
-                })
-            });
+            await axios.post('http://localhost:3000/account/register', { username, password }, { withCredentials: true })
             props.logIn();
         } finally {
             setIsLoading(false);

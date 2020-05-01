@@ -31,7 +31,7 @@ body {
 .logged-in-logo {
     font-family: 'CoreCircus', sans-serif;
     text-transform: uppercase;
-    font-size: 24px;
+    font-size: 32px;
     margin-top: 10px;
     margin-left: 20px;
     line-height: 1;
@@ -110,6 +110,7 @@ body {
     padding-right: 5px;
     background-color: inherit;
     width: 80%;
+    font-family: 'Montserrat Medium';
 }
 
 .column-title:focus {
@@ -118,7 +119,7 @@ body {
 
 .add-column-button {
     margin-left: 20px;
-    background-color: #70c1b3;
+    background-image: linear-gradient(to left, #74ebd5, #9face6);
     color: white;
 }
 
@@ -127,7 +128,7 @@ body {
 }
 
 .add-card-button {
-    background-color: #70c1b3;
+    background-image: linear-gradient(to left, #74ebd5, #9face6);
     color: white;
 }
 
@@ -162,4 +163,12 @@ body {
 .login-link {
     text-decoration: underline;
     cursor: pointer;
+}
+
+.log-out-btn {
+    font-family: 'Montserrat Medium';
+    background-image: linear-gradient(to left, #74ebd5, #9face6);
+    color: white;
+    text-transform: uppercase;
+    margin-right: 20px;
 }

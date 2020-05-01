@@ -4,7 +4,7 @@ import axios from 'axios';
 import App from './App';
 
 (async () => {
-	const response = await axios.get('http://localhost:3000/isLoggedIn', { withCredentials: true });
+	const response = await axios.get('http://localhost:3000/account/isLoggedIn', { withCredentials: true });
 	ReactDOM.render(
 		<React.StrictMode>
 			<App isLoggedIn={response.data}></App>

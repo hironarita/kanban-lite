@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+import axios from 'axios';
 import { Column } from './components/Column';
 import { CardModel } from './models/Card';
 import { ColumnModel } from './models/Column';
@@ -93,12 +94,18 @@ function App(props: IAppProps) {
 		setCardIdToHeightMap(clone);
 	}, [cardIdToHeightMap]);
 
+	const logout = async () => {
+		await axios.get('http://localhost:3000/account/logout', { withCredentials: true });
+		setIsLoggedIn(false);
+	};
+
 	return (
 		<Router>
 			{isLoggedIn === true
 				? <div>
-					<div className='d-flex align-items-center'>
+					<div className='d-flex align-items-center w-100 justify-content-between'>
 						<h1 className='logged-in-logo'>Kanban Lite</h1>
+						<button className='btn log-out-btn mt-2' onClick={() => logout()}>Log Out</button>
 					</div>
 					<DndProvider backend={Backend}>
 						<div className='trello-container'>
