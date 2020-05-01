@@ -18,9 +18,10 @@ export function LoginSignup(props: ILoginSignupProps) {
 
     const isLoginDisabled = username.length === 0 || password.length === 0;
     const isSignupDisabled = isLoginDisabled === true || confirmPassword.length === 0;
-    const isButtonDisabled = isLoggingIn === true
+    const isButtonDisabled = (isLoggingIn === true
         ? isLoginDisabled === true
-        : isSignupDisabled === true;
+        : isSignupDisabled === true)
+        || isLoading === true;
 
     // cleanup
     useEffect(() => { return () => setIsLoading(false) }, [isLoading]);
@@ -100,7 +101,7 @@ export function LoginSignup(props: ILoginSignupProps) {
                 <button
                     type='button'
                     className='btn login-btn w-100'
-                    disabled={isLoading === true || isButtonDisabled === true}
+                    disabled={isButtonDisabled === true}
                     onClick={() => isLoggingIn === true ? login() : register()}>
                     {isLoggingIn === true ? 'Log In' : 'Sign Up'}
                 </button>
