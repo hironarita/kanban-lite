@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { post } from '../utilities/Axios';
 
 const headers = new Headers();
 headers.append('Content-Type', 'application/json');
@@ -21,7 +21,7 @@ export function LoginSignup(props: ILoginSignupProps) {
     const login = async () => {
         setIsLoading(true);
         try {
-            await axios.post('http://localhost:3000/account/login', { username, password }, { withCredentials: true })
+            await post('/account/login', { username, password });
             props.logIn();
         } finally {
             setIsLoading(false);
@@ -31,7 +31,7 @@ export function LoginSignup(props: ILoginSignupProps) {
     const register = async () => {
         setIsLoading(true);
         try {
-            await axios.post('http://localhost:3000/account/register', { username, password }, { withCredentials: true })
+            await post('/account/register', { username, password });
             props.logIn();
         } finally {
             setIsLoading(false);
