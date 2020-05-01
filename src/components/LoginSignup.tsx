@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2'
 import { post } from '../utilities/Axios';
 
 const headers = new Headers();
@@ -15,6 +16,12 @@ export function LoginSignup(props: ILoginSignupProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggingIn, setIsLogginIn] = useState(false);
 
+    const isLoginDisabled = username.length === 0 || password.length === 0;
+    const isSignupDisabled = isLoginDisabled === true || confirmPassword.length === 0;
+    const isButtonDisabled = isLoggingIn === true
+        ? isLoginDisabled === true
+        : isSignupDisabled === true;
+
     // cleanup
     useEffect(() => { return () => setIsLoading(false) }, [isLoading]);
 
@@ -29,6 +36,22 @@ export function LoginSignup(props: ILoginSignupProps) {
     };
 
     const register = async () => {
+        if (password.length < 6) {
+            return Swal.fire({
+                title: 'Error!',
+                text: 'Please make sure your password is at least 6 characters',
+                icon: 'error'
+            });
+        }
+
+        if (password !== confirmPassword) {
+            return Swal.fire({
+                title: 'Error!',
+                text: 'Please make sure your passwords match',
+                icon: 'error'
+            });
+        }
+
         setIsLoading(true);
         try {
             await post('/account/register', { username, password });
@@ -52,7 +75,7 @@ export function LoginSignup(props: ILoginSignupProps) {
                         placeholder='Enter username'
                         disabled={isLoading === true} />
                 </div>
-                <div className='form-group'>                 
+                <div className='form-group'>
                     <input
                         type='password'
                         className='form-control'
@@ -63,7 +86,7 @@ export function LoginSignup(props: ILoginSignupProps) {
                         disabled={isLoading === true} />
                 </div>
                 {isLoggingIn === false &&
-                    <div className='form-group'>                     
+                    <div className='form-group'>
                         <input
                             type='password'
                             className='form-control'
@@ -77,7 +100,7 @@ export function LoginSignup(props: ILoginSignupProps) {
                 <button
                     type='button'
                     className='btn login-btn w-100'
-                    disabled={isLoading}
+                    disabled={isLoading === true || isButtonDisabled === true}
                     onClick={() => isLoggingIn === true ? login() : register()}>
                     {isLoggingIn === true ? 'Log In' : 'Sign Up'}
                 </button>
@@ -85,7 +108,7 @@ export function LoginSignup(props: ILoginSignupProps) {
                     {isLoggingIn === true
                         ? <span className='login-question-text'>Don't have an account? <span className='login-link' onClick={() => setIsLogginIn(false)}>Sign up here</span></span>
                         : <span className='login-question-text'>Already have an account? <span className='login-link' onClick={() => setIsLogginIn(true)}>Log in here</span></span>
-                    }                  
+                    }
                 </div>
             </form>
         </div>

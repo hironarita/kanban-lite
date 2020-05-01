@@ -16,6 +16,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "react-textarea-autosize": "^7.1.2",
+    "sweetalert2": "^9.10.12",
     "typescript": "^3.8.3"
   },
   "scripts": {
