@@ -12,11 +12,11 @@ export function LoginSignup() {
     // const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const isLoggingIn = useRouteMatch().path === Path.Login;
+    const isLoggingIn = useRouteMatch().path === Path.Card;
 
     const login = async () => {
         setIsLoading(true);
-        try {      
+        try {
             await fetch('http://localhost:3000/login', {
                 method: 'POST',
                 credentials: 'include',
@@ -33,7 +33,7 @@ export function LoginSignup() {
 
     const register = async () => {
         setIsLoading(true);
-        try {      
+        try {
             await fetch('http://localhost:3000/register', {
                 method: 'POST',
                 credentials: 'include',
@@ -49,34 +49,49 @@ export function LoginSignup() {
     };
 
     return (
-        <form>
-            <div className='form-group'>
-                <label htmlFor='username'>Username</label>
-                <input
-                    type='text'
-                    className='form-control'
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
-                    id='username'
-                    placeholder='Enter username' />
-            </div>
-            <div className='form-group'>
-                <label htmlFor='password'>Password</label>
-                <input
-                    type='password'
-                    className='form-control'
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    id='password'
-                    placeholder='Password' />
-            </div>
-            <button
-                type='button'
-                className='btn btn-primary'
-                disabled={isLoading}
-                onClick={() => isLoggingIn === true ? login() : register()}>
-                {isLoggingIn === true ? 'Login' : 'Signup'}
-            </button>
-        </form>
+        <div className='d-flex justify-content-center align-items-center vw-100 login-signup-container'>
+            <form className='login-signup-form'>
+                <h1 className='logged-out-logo text-center mb-5'>Kanban Lite</h1>
+                <div className='form-group'>
+                    <input
+                        type='text'
+                        className='form-control'
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        id='username'
+                        placeholder='Enter username' />
+                </div>
+                <div className='form-group'>                 
+                    <input
+                        type='password'
+                        className='form-control'
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        id='password'
+                        placeholder='Password' />
+                </div>
+                {isLoggingIn === false &&
+                    <div className='form-group'>                     
+                        <input
+                            type='password'
+                            className='form-control'
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            id='confirmPassword'
+                            placeholder='Confirm password' />
+                    </div>
+                }
+                <button
+                    type='button'
+                    className='btn login-btn w-100 mt-3'
+                    disabled={isLoading}
+                    onClick={() => isLoggingIn === true ? login() : register()}>
+                    {isLoggingIn === true ? 'Log In' : 'Sign Up'}
+                </button>
+                <div className='text-center mt-5'>
+                    <span className='login-question-text'>Already have an account? Log in here</span>
+                </div>
+            </form>
+        </div>
     )
 }

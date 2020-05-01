@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Column } from './components/Column';
 import { CardModel } from './models/Card';
 import { ColumnModel } from './models/Column';
 import { ModalManager } from './components/ModalManager';
 import { Path } from './utilities/Enums';
+import { LoginSignup } from './components/LoginSignup';
 
 declare interface IAppProps {
 	readonly isLoggedIn: boolean;
@@ -93,58 +94,53 @@ function App(props: IAppProps) {
 
 	return (
 		<Router>
-			<div className='d-flex align-items-center'>
-				<h1 className='logo'>Kanban Lite</h1>
-				{props.isLoggedIn === false &&
-					<div>
-						<Link to={Path.Login}>
-							<button type='button' className='btn login-btn ml-3 mt-2'>Login</button>
-						</Link>
-						<Link to={Path.Signup}>
-							<button type='button' className='btn login-btn ml-3 mt-2'>Signup</button>
-						</Link>
+			{props.isLoggedIn === true
+				? <div>
+					<div className='d-flex align-items-center'>
+						<h1 className='logged-in-logo'>Kanban Lite</h1>
 					</div>
-				}
-			</div>
-			<DndProvider backend={Backend}>
-				<div className='trello-container'>
-					{sortedColumns.map((x, i) =>
-						<div key={x.Id}>
-							<Column
-								columnId={x.Id}
-								boardIndex={x.BoardIndex}
-								highlightedColumnId={highlightedColumnId}
-								title={x.Title}
-								cardCount={cards.filter(y => y.ColumnId === x.Id).length}
-								dragColumnId={dragColumnId}
-								dragColumnHeight={dragColumnHeight}
-								dragCardId={dragCardId}
-								dragCardHeight={dragCardHeight}
-								isDragInProgress={isDragInProgress}
-								cards={cards}
-								setIsDragInProgress={(x: boolean) => setIsDragInProgress(x)}
-								setCardHeight={(cardId: number, height: number) => setCardHeight(cardId, height)}
-								setDragCardId={(cardId: number) => setDragCardId(cardId)}
-								setDragColumnId={(columnId: number) => setDragColumnId(columnId)}
-								setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
-								changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}
-								setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
-								setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
-								moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
-								moveColumn={(oldColumnId: number, newColumn: ColumnModel) => moveColumn(oldColumnId, newColumn)} />
+					<DndProvider backend={Backend}>
+						<div className='trello-container'>
+							{sortedColumns.map((x, i) =>
+								<div key={x.Id}>
+									<Column
+										columnId={x.Id}
+										boardIndex={x.BoardIndex}
+										highlightedColumnId={highlightedColumnId}
+										title={x.Title}
+										cardCount={cards.filter(y => y.ColumnId === x.Id).length}
+										dragColumnId={dragColumnId}
+										dragColumnHeight={dragColumnHeight}
+										dragCardId={dragCardId}
+										dragCardHeight={dragCardHeight}
+										isDragInProgress={isDragInProgress}
+										cards={cards}
+										setIsDragInProgress={(x: boolean) => setIsDragInProgress(x)}
+										setCardHeight={(cardId: number, height: number) => setCardHeight(cardId, height)}
+										setDragCardId={(cardId: number) => setDragCardId(cardId)}
+										setDragColumnId={(columnId: number) => setDragColumnId(columnId)}
+										setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
+										changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}
+										setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
+										setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
+										moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
+										moveColumn={(oldColumnId: number, newColumn: ColumnModel) => moveColumn(oldColumnId, newColumn)} />
+								</div>
+							)}
+							<div>
+								<button
+									type='button'
+									onClick={() => addColumn()}
+									className='btn add-column-button'>
+									+ Add another list
+								</button>
+							</div>
 						</div>
-					)}
-					<div>
-						<button
-							type='button'
-							onClick={() => addColumn()}
-							className='btn add-column-button'>
-							+ Add another list
-						</button>
-					</div>
+					</DndProvider>
 				</div>
-			</DndProvider>
-			<Route path={[Path.Login, Path.Signup]}>
+				: <LoginSignup />
+			}
+			<Route path={Path.Card}>
 				<ModalManager />
 			</Route>
 		</Router>

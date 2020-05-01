@@ -7,12 +7,28 @@
         url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/209981/333BF4_8_0.ttf') format('truetype');
 }
 
+@font-face {
+    font-family: 'Montserrat';
+    src: url('./fonts/Montserrat-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Montserrat Medium';
+    src: url('./fonts/Montserrat-Medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Montserrat Bold';
+    src: url('./fonts/Montserrat-Bold.ttf') format('truetype');
+}
+
 body {
     background-color: #247ba0;
     color: #393E41;
+    font-family: 'Montserrat';
 }
 
-.logo {
+.logged-in-logo {
     font-family: 'CoreCircus', sans-serif;
     text-transform: uppercase;
     font-size: 24px;
@@ -24,6 +40,18 @@ body {
         2px 1px 0px #70c1b3, 1px 2px 0px #70c1b3, 3px 2px 0px #70c1b3, 2px 3px 0px #70c1b3, 4px 3px 0px #70c1b3, 3px 4px 0px #70c1b3, 5px 4px 0px #70c1b3,
         3px 5px 0px #247ba0, 6px 5px 0px #247ba0, -1px 2px 0 black, 0 3px 0 #247ba0, 1px 4px 0 #247ba0, 2px 5px 0px #247ba0, 2px -1px 0 #247ba0,
         3px 0 0 #247ba0, 4px 1px 0 #247ba0, 5px 2px 0px #247ba0, 6px 3px 0 #247ba0, 7px 4px 0 #247ba0, 10px 10px 4px #70c1b3;
+}
+
+.logged-out-logo {
+    font-family: 'CoreCircus', sans-serif;
+    text-transform: uppercase;
+    font-size: 32px;
+    line-height: 1;
+    color: #f3ffbd;
+    text-shadow: -1px -1px 0 #247ba0, 1px -1px 0 #247ba0, -1px 1px 0 #247ba0, 1px 1px 0 #247ba0, 1px 0px 0px #70c1b3, 0px 1px 0px #70c1b3,
+        2px 1px 0px #70c1b3, 1px 2px 0px #70c1b3, 3px 2px 0px #70c1b3, 2px 3px 0px #70c1b3, 4px 3px 0px #70c1b3, 3px 4px 0px #70c1b3, 5px 4px 0px #70c1b3,
+        3px 5px 0px #247ba0, 6px 5px 0px #247ba0, -1px 2px 0 black, 0 3px 0 #247ba0, 1px 4px 0 #247ba0, 2px 5px 0px #247ba0, 2px -1px 0 #247ba0,
+        3px 0 0 #247ba0, 4px 1px 0 #247ba0, 5px 2px 0px #247ba0, 6px 3px 0 #247ba0, 7px 4px 0 #247ba0, 10px 10px 4px #70c1b3; 
 }
 
 .trello-container {
@@ -113,6 +141,20 @@ body {
 }
 
 .login-btn {
-    background-color: #b2dbbf;
+    font-family: 'Montserrat Medium';
+    background-image: linear-gradient(to left, #74ebd5, #9face6);
     color: white;
+    text-transform: uppercase;
+}
+
+.login-signup-container {
+    height: 100vh;
+}
+
+.login-question-text {
+    font-family: 'Montserrat Medium';
+}
+
+.login-signup-form {
+    width: 400px;
 }

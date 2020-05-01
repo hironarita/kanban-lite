@@ -7,7 +7,7 @@ import { LoginSignup } from './LoginSignup';
 export function ModalManager() {
     const handleClose = () => window.location.href = Path.Home;
 
-    const Component = [Path.Login, Path.Signup].includes(useRouteMatch().path as Path)
+    const Component = [Path.Card].includes(useRouteMatch().path as Path)
         ? LoginSignup
         : LoginSignup;
 
