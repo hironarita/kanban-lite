@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
@@ -15,8 +15,7 @@ declare interface IAppProps {
 }
 function App(props: IAppProps) {
 	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
-	const toDoColumn = new ColumnModel(Date.now(), 'To Do', 0);
-	const [columns, setColumns] = useState<ReadonlyArray<ColumnModel>>([toDoColumn]);
+	const [columns, setColumns] = useState<ReadonlyArray<ColumnModel>>([]);
 	const [highlightedColumnId, setHighlightedColumnId] = useState(0);
 	const [columnIdToHeightMap, setColumnIdToHeightMap] = useState(new Map<number, number>());
 	const [dragColumnId, setDragColumnId] = useState(0);
@@ -24,6 +23,16 @@ function App(props: IAppProps) {
 	const [cardIdToHeightMap, setCardIdToHeightMap] = useState(new Map<number, number>());
 	const [isDragInProgress, setIsDragInProgress] = useState(false);
 	const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
+
+	useEffect(() => {
+		(async () => {
+			if (isLoggedIn === true) {
+				const data = await get<ReadonlyArray<IColumnData>>('/columns');
+				const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
+				setColumns(columns);
+			}
+		})();
+	}, [isLoggedIn]);
 
 	const sortedColumns = columns
 		.slice()

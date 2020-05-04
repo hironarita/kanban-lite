@@ -14,6 +14,13 @@ instance.interceptors.response.use(response => response, error => {
             icon: 'error'
         });
     }
+    if (errRes.config.url === '/account/login' && errRes.status === 400) {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Invalid username/password',
+            icon: 'error'
+        });
+    }
     return Promise.reject(error);
 });
 
