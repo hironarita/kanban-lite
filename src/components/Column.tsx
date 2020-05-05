@@ -60,9 +60,8 @@ export function Column(props: IColumnProps) {
     useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
     useEffect(() => {
-        const difference = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 30;
-        const finalHeight = displayCard === true ? difference - 20 : difference;
-        setInvisibleColumnHeight(finalHeight);
+        const height = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 40;
+        setInvisibleColumnHeight(height);
     }, [displayCard, columnIdAsString]);
 
     const filteredCards = useMemo(() => props.cards
