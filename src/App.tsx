@@ -24,12 +24,16 @@ function App(props: IAppProps) {
 	const [isDragInProgress, setIsDragInProgress] = useState(false);
 	const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
 
+	const getColumnsAndSetState = async () => {
+		const data = await get<ReadonlyArray<IColumnData>>('/columns');
+		const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
+		setColumns(columns);
+	};
+
 	useEffect(() => {
 		(async () => {
 			if (isLoggedIn === true) {
-				const data = await get<ReadonlyArray<IColumnData>>('/columns');
-				const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
-				setColumns(columns);
+				await getColumnsAndSetState();
 			}
 		})();
 	}, [isLoggedIn]);
@@ -75,16 +79,16 @@ function App(props: IAppProps) {
 			boardIndex: columns.length
 		};
 		await post('/columns/create', data);
-		const cols = await get<ReadonlyArray<IColumnData>>('/columns');
-		const newCols = cols.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
-		setColumns(newCols);
+		await getColumnsAndSetState();
 	};
 
-	const changeColumnTitle = (columnId: number, newTitle: string, boardIndex: number) => {
-		const clonedColumns = columns.slice();
-		const filtered = clonedColumns.filter(x => x.Id !== columnId);
-		const newColumn = new ColumnModel(columnId, newTitle, boardIndex);
-		setColumns(filtered.concat([newColumn]));
+	const changeColumnTitle = async (columnId: number, newTitle: string) => {
+		const data = {
+			id: columnId,
+			title: newTitle
+		};
+		await post('/columns/update', data);
+		await getColumnsAndSetState();
 	};
 
 	const moveColumn = (oldColumnId: number, newColumn: ColumnModel) => {
@@ -141,7 +145,7 @@ function App(props: IAppProps) {
 										setDragCardId={(cardId: number) => setDragCardId(cardId)}
 										setDragColumnId={(columnId: number) => setDragColumnId(columnId)}
 										setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
-										changeColumnTitle={(columnId: number, newTitle: string, boardIndex: number) => changeColumnTitle(columnId, newTitle, boardIndex)}
+										changeColumnTitle={(columnId: number, newTitle: string) => changeColumnTitle(columnId, newTitle)}
 										setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
 										setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 										moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}

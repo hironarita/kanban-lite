@@ -25,7 +25,7 @@ declare interface IColumnProps {
     readonly setCardHeight: (cardId: number, height: number) => void;
     readonly setDragColumnId: (columnId: number) => void;
     readonly setColumnHeight: (columnId: number, height: number) => void;
-    readonly changeColumnTitle: (columnId: number, newTitle: string, boardIndex: number) => void;
+    readonly changeColumnTitle: (columnId: number, newTitle: string) => void;
     readonly setHighlightedColumnId: (id: number) => void;
     readonly setParentCards: (title: string, columnId: number, cardId: number, columnIndex: number) => void;
     readonly moveCard: (cardId: number, newCard: CardModel, oldColumnId: number) => void;
@@ -149,7 +149,6 @@ export function Column(props: IColumnProps) {
 
     const handleOnChange = (title: string) => {
         setColumnTitle(title);
-        props.changeColumnTitle(props.columnId, title, props.boardIndex);
     };
 
     const handleKeyDown = (key: string) => {
@@ -192,7 +191,8 @@ export function Column(props: IColumnProps) {
                                     value={columnTitle}
                                     placeholder='Enter list title...'
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
-                                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)} />
+                                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)}
+                                    onBlur={() => props.changeColumnTitle(props.columnId, columnTitle)} />
                             </div>
                             {filteredCards.length <= 1 && displayFirstPlaceholderCard === true &&
                                 <div style={{ height: props.dragCardHeight }} className='card trello-card placeholder-card'></div>
