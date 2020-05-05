@@ -29,13 +29,14 @@ declare interface IColumnProps {
     readonly setHighlightedColumnId: (id: number) => void;
     readonly setParentCards: (title: string, columnId: number, cardId: number, columnIndex: number) => void;
     readonly moveCard: (cardId: number, newCard: CardModel, oldColumnId: number) => void;
-    readonly moveColumn: (columnId: number, newColumn: ColumnModel) => void;
+    readonly moveColumn: (columnId: number, newColumn: ColumnModel, oldBoardIndex: number) => void;
 }
 
 declare interface IDraggableColumn {
     readonly type: string;
     readonly title: string;
     readonly columnId: number;
+    readonly boardIndex: number;
 }
 
 export function Column(props: IColumnProps) {
@@ -61,7 +62,7 @@ export function Column(props: IColumnProps) {
 
     useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
-        useEffect(() => {
+    useEffect(() => {
         const difference = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 30;
         const finalHeight = displayCard === true ? difference - 20 : difference;
         setInvisibleColumnHeight(finalHeight);
@@ -77,7 +78,7 @@ export function Column(props: IColumnProps) {
     }, [filteredCards, props.columnId, displayCard]);
 
     const [, drag] = useDrag({
-        item: { type: 'column', title: columnTitle, columnId: props.columnId },
+        item: { type: 'column', title: columnTitle, columnId: props.columnId, boardIndex: props.boardIndex },
         collect: monitor => {
             if (monitor.isDragging()) {
                 setIsDragging(true);
@@ -104,7 +105,7 @@ export function Column(props: IColumnProps) {
                     ? props.boardIndex
                     : props.boardIndex + 1;
                 const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
-                props.moveColumn(item.columnId, newColumn);
+                props.moveColumn(item.columnId, newColumn, (item as IDraggableColumn).boardIndex);
             }
 
             if (item.type === 'card') {

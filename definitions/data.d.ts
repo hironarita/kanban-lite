@@ -1,4 +1,4 @@
-declare interface IColumnData {
+declare interface IColumn {
     readonly boardIndex: number;
     readonly createdAt: string;
     readonly id: number;

@@ -25,7 +25,7 @@ function App(props: IAppProps) {
 	const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
 
 	const getColumnsAndSetState = async () => {
-		const data = await get<ReadonlyArray<IColumnData>>('/columns');
+		const data = await get<ReadonlyArray<IColumn>>('/columns');
 		const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
 		setColumns(columns);
 	};
@@ -82,22 +82,23 @@ function App(props: IAppProps) {
 		await getColumnsAndSetState();
 	};
 
-	const changeColumnTitle = async (columnId: number, newTitle: string) => {
+	const changeColumnTitle = async (id: number, newTitle: string) => {
 		const data = {
-			id: columnId,
+			id,
 			title: newTitle
 		};
 		await post('/columns/update', data);
 		await getColumnsAndSetState();
 	};
 
-	const moveColumn = async (oldColumnId: number, newColumn: ColumnModel) => {
+	const moveColumn = async (oldColumnId: number, newColumn: ColumnModel, oldBoardIndex: number) => {
 		const clonedColumns = columns
 			.slice()
 			.sort((x, y) => x.BoardIndex > y.BoardIndex ? 1 : -1);
-		const filteredColumns = clonedColumns.filter(x => x.Id !== oldColumnId);
-		filteredColumns.splice(newColumn.BoardIndex, 0, newColumn);
-		const newColumns = filteredColumns.map((x, i) => new ColumnModel(x.Id, x.Title, i));
+		clonedColumns.splice(newColumn.BoardIndex, 0, newColumn);
+		const newColumns = clonedColumns
+			.filter(x => !(x.Id === oldColumnId && x.BoardIndex === oldBoardIndex))
+			.map((x, i) => new ColumnModel(x.Id, x.Title, i));
 		let data = {};
 		for (let i = 0; i < newColumns.length; i++) {
 			data = { ...data, [newColumns[i].Id]: newColumns[i].BoardIndex };
@@ -133,7 +134,7 @@ function App(props: IAppProps) {
 					</div>
 					<DndProvider backend={Backend}>
 						<div className='trello-container'>
-							{sortedColumns.map((x, i) =>
+							{sortedColumns.map(x =>
 								<div key={x.Id}>
 									<Column
 										columnId={x.Id}
@@ -156,7 +157,7 @@ function App(props: IAppProps) {
 										setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
 										setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 										moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
-										moveColumn={(oldColumnId: number, newColumn: ColumnModel) => moveColumn(oldColumnId, newColumn)} />
+										moveColumn={(oldColumnId: number, newColumn: ColumnModel, oldBoardIndex: number) => moveColumn(oldColumnId, newColumn, oldBoardIndex)} />
 								</div>
 							)}
 							<div>
