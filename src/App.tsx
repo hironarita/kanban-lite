@@ -107,11 +107,11 @@ function App(props: IAppProps) {
 		await getColumnsAndSetState();
 	};
 
-	const setColumnHeight = useCallback((columnId: number, height: number) => {
+	const setColumnHeight = (columnId: number, height: number) => {
 		const clone = new Map(columnIdToHeightMap);
 		clone.set(columnId, height);
 		setColumnIdToHeightMap(clone);
-	}, [columnIdToHeightMap]);
+	};
 
 	const setCardHeight = useCallback((cardId: number, height: number) => {
 		const clone = new Map(cardIdToHeightMap);

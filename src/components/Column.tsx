@@ -43,7 +43,6 @@ export function Column(props: IColumnProps) {
     let textarea = useRef<any>(null);
     const ref = useRef(null);
     const columnRef = useRef<any>(null);
-    const latestSetColumnHeight = useRef(props.setColumnHeight);
 
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
@@ -58,8 +57,6 @@ export function Column(props: IColumnProps) {
 
     const columnIdAsString = props.columnId.toString();
 
-    useEffect(() => { latestSetColumnHeight.current = props.setColumnHeight });
-
     useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
 
     useEffect(() => {
@@ -72,15 +69,15 @@ export function Column(props: IColumnProps) {
         .filter(x => x.ColumnId === props.columnId)
         .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
 
-    useEffect(() => {
-        const columnHeight = columnRef.current.clientHeight;
-        latestSetColumnHeight.current(props.columnId, filteredCards.length === 0 ? columnHeight + 10 : columnHeight);
-    }, [filteredCards, props.columnId, displayCard]);
 
     const [, drag] = useDrag({
         item: { type: 'column', title: columnTitle, columnId: props.columnId, boardIndex: props.boardIndex },
         collect: monitor => {
             if (monitor.isDragging()) {
+                if (columnRef.current != null) {
+                    const columnHeight = columnRef.current.clientHeight;
+                    props.setColumnHeight(props.columnId, columnHeight);
+                }
                 setIsDragging(true);
                 props.setIsDragInProgress(true);
             } else {
