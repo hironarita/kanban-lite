@@ -101,7 +101,7 @@ export function Column(props: IColumnProps) {
         drop: (item: IDraggableColumn | IDraggableCard) => {
             if (item.type === 'column') {
                 const boardIndex = displayDroppableLeftColumn === true
-                    ? props.boardIndex - 1
+                    ? props.boardIndex
                     : props.boardIndex + 1;
                 const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
                 props.moveColumn(item.columnId, newColumn);

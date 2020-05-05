@@ -121,6 +121,7 @@ body {
     margin-left: 20px;
     background-image: linear-gradient(to left, #74ebd5, #9face6);
     color: white;
+    margin-right: 20px;
 }
 
 .droppable-column {

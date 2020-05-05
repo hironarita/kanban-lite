@@ -91,12 +91,19 @@ function App(props: IAppProps) {
 		await getColumnsAndSetState();
 	};
 
-	const moveColumn = (oldColumnId: number, newColumn: ColumnModel) => {
-		const clonedColumns = columns.slice();
-		const filteredColumns = clonedColumns.filter(x => x.Id !== oldColumnId)
+	const moveColumn = async (oldColumnId: number, newColumn: ColumnModel) => {
+		const clonedColumns = columns
+			.slice()
+			.sort((x, y) => x.BoardIndex > y.BoardIndex ? 1 : -1);
+		const filteredColumns = clonedColumns.filter(x => x.Id !== oldColumnId);
 		filteredColumns.splice(newColumn.BoardIndex, 0, newColumn);
 		const newColumns = filteredColumns.map((x, i) => new ColumnModel(x.Id, x.Title, i));
-		setColumns(newColumns);
+		let data = {};
+		for (let i = 0; i < newColumns.length; i++) {
+			data = { ...data, [newColumns[i].Id]: newColumns[i].BoardIndex };
+		}
+		await post('/columns/move', data);
+		await getColumnsAndSetState();
 	};
 
 	const setColumnHeight = useCallback((columnId: number, height: number) => {

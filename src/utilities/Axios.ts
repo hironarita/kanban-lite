@@ -7,19 +7,21 @@ const instance = axios.create({
 });
 instance.interceptors.response.use(response => response, error => {
     const errRes = error.response;
-    if (errRes.config.url === '/account/register' && errRes.status === 400) {
-        Swal.fire({
-            title: 'Error!',
-            text: 'Username already taken',
-            icon: 'error'
-        });
-    }
-    if (errRes.config.url === '/account/login' && errRes.status === 400) {
-        Swal.fire({
-            title: 'Error!',
-            text: 'Invalid username/password',
-            icon: 'error'
-        });
+    if (errRes) {
+        if (errRes.config.url === '/account/register' && errRes.status === 400) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Username already taken',
+                icon: 'error'
+            });
+        }
+        if (errRes.config.url === '/account/login' && errRes.status === 400) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Invalid username/password',
+                icon: 'error'
+            });
+        }
     }
     return Promise.reject(error);
 });
