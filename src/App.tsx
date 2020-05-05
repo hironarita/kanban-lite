@@ -8,7 +8,7 @@ import { ColumnModel } from './models/Column';
 import { ModalManager } from './components/ModalManager';
 import { Path } from './utilities/Enums';
 import { LoginSignup } from './components/LoginSignup';
-import { get } from './utilities/Axios';
+import { get, post } from './utilities/Axios';
 
 declare interface IAppProps {
 	readonly isLoggedIn: boolean;
@@ -69,11 +69,15 @@ function App(props: IAppProps) {
 		setCards(unchangedCards.concat(newCards).concat(resetCards));
 	};
 
-	const addColumn = () => {
-		const clonedColumns = columns.slice();
-		const newColumn = new ColumnModel(Date.now(), '', clonedColumns.length);
-		clonedColumns.push(newColumn);
-		setColumns(clonedColumns);
+	const addColumn = async () => {
+		const data = {
+			title: '',
+			boardIndex: columns.length
+		};
+		await post('/columns/create', data);
+		const cols = await get<ReadonlyArray<IColumnData>>('/columns');
+		const newCols = cols.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
+		setColumns(newCols);
 	};
 
 	const changeColumnTitle = (columnId: number, newTitle: string, boardIndex: number) => {
@@ -112,7 +116,7 @@ function App(props: IAppProps) {
 		<Router>
 			{isLoggedIn === true
 				? <div>
-					<div className='d-flex'>
+					<div className='d-flex mt-3'>
 						<h1 className='logged-in-logo'>Kanban Lite</h1>
 						<button className='btn log-out-btn' onClick={() => logout()}>Log Out</button>
 					</div>

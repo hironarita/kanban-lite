@@ -2,10 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { post } from '../utilities/Axios';
 
-const headers = new Headers();
-headers.append('Content-Type', 'application/json');
-headers.append('Accept', 'application/json');
-
 declare interface ILoginSignupProps {
     readonly logIn: () => void;
 }
@@ -26,7 +22,7 @@ export function LoginSignup(props: ILoginSignupProps) {
     // cleanup
     useEffect(() => { return () => setIsLoading(false) }, [isLoading]);
 
-    const login = async () => {
+    const logIn = async () => {
         setIsLoading(true);
         try {
             await post('/account/login', { username, password });
@@ -64,7 +60,7 @@ export function LoginSignup(props: ILoginSignupProps) {
 
     const handleKeyPress = (key: string) => {
         if (key === 'Enter' && isButtonDisabled === false) {
-            isLoggingIn === true ? login() : register();
+            isLoggingIn === true ? logIn() : register();
         }
     };
 
@@ -110,7 +106,7 @@ export function LoginSignup(props: ILoginSignupProps) {
                     type='button'
                     className='btn login-btn w-100'
                     disabled={isButtonDisabled === true}
-                    onClick={() => isLoggingIn === true ? login() : register()}>
+                    onClick={() => isLoggingIn === true ? logIn() : register()}>
                     {isLoggingIn === true ? 'Log In' : 'Sign Up'}
                 </button>
                 <div className='text-center mt-5'>
