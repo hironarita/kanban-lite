@@ -62,6 +62,12 @@ export function LoginSignup(props: ILoginSignupProps) {
         }
     };
 
+    const handleKeyPress = (key: string) => {
+        if (key === 'Enter' && isButtonDisabled === false) {
+            isLoggingIn === true ? login() : register();
+        }
+    };
+
     return (
         <div className='d-flex justify-content-center align-items-center vw-100 login-signup-container'>
             <form className='login-signup-form'>
@@ -84,7 +90,8 @@ export function LoginSignup(props: ILoginSignupProps) {
                         onChange={e => setPassword(e.target.value)}
                         id='password'
                         placeholder='Password'
-                        disabled={isLoading === true} />
+                        disabled={isLoading === true}
+                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (isLoggingIn === true) handleKeyPress(e.key) }} />
                 </div>
                 {isLoggingIn === false &&
                     <div className='form-group'>
@@ -95,7 +102,8 @@ export function LoginSignup(props: ILoginSignupProps) {
                             onChange={e => setConfirmPassword(e.target.value)}
                             id='confirmPassword'
                             placeholder='Confirm password'
-                            disabled={isLoading === true} />
+                            disabled={isLoading === true}
+                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyPress(e.key)} />
                     </div>
                 }
                 <button
