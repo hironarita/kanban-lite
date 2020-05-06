@@ -24,16 +24,22 @@ function App(props: IAppProps) {
 	const [isDragInProgress, setIsDragInProgress] = useState(false);
 	const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
 
-	const getColumnsAndSetState = async () => {
+	const getColumnsCardsAndSetState = async () => {
 		const data = await get<ReadonlyArray<IColumn>>('/columns');
 		const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
 		setColumns(columns);
+		const colIds = columns
+			.map(x => x.Id)
+			.join(',');
+		const cardData = await get<ReadonlyArray<ICard>>('/cards?columnIds=' + colIds);
+		const cards = cardData.map(x => new CardModel(x.id, x.title, x.column_id, x.columnIndex));
+		setCards(cards);
 	};
 
 	useEffect(() => {
 		(async () => {
 			if (isLoggedIn === true) {
-				await getColumnsAndSetState();
+				await getColumnsCardsAndSetState();
 			}
 		})();
 	}, [isLoggedIn]);
@@ -79,7 +85,7 @@ function App(props: IAppProps) {
 			boardIndex: columns.length
 		};
 		await post('/columns/create', data);
-		await getColumnsAndSetState();
+		await getColumnsCardsAndSetState();
 	};
 
 	const changeColumnTitle = async (id: number, newTitle: string) => {
@@ -88,7 +94,7 @@ function App(props: IAppProps) {
 			title: newTitle
 		};
 		await post('/columns/update', data);
-		await getColumnsAndSetState();
+		await getColumnsCardsAndSetState();
 	};
 
 	const moveColumn = async (oldColumnId: number, newColumn: ColumnModel, oldBoardIndex: number) => {
@@ -104,7 +110,7 @@ function App(props: IAppProps) {
 			data = { ...data, [newColumns[i].Id]: newColumns[i].BoardIndex };
 		}
 		await post('/columns/move', data);
-		await getColumnsAndSetState();
+		await getColumnsCardsAndSetState();
 	};
 
 	const setColumnHeight = (columnId: number, height: number) => {

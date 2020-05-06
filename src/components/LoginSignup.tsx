@@ -10,7 +10,7 @@ export function LoginSignup(props: ILoginSignupProps) {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoggingIn, setIsLogginIn] = useState(false);
+    const [isLoggingIn, setIsLogginIn] = useState(true);
 
     const isLoginDisabled = username.length === 0 || password.length === 0;
     const isSignupDisabled = isLoginDisabled === true || confirmPassword.length === 0;
