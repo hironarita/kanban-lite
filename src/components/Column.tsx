@@ -4,6 +4,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { Card, IDraggableCard } from './Card';
 import { CardModel } from '../models/Card';
 import { ColumnModel } from '../models/Column';
+import { post } from '../utilities/Axios';
 
 declare interface IColumnProps {
     readonly columnId: number;
@@ -27,9 +28,9 @@ declare interface IColumnProps {
     readonly setColumnHeight: (columnId: number, height: number) => void;
     readonly changeColumnTitle: (columnId: number, newTitle: string) => void;
     readonly setHighlightedColumnId: (id: number) => void;
-    readonly setParentCards: (title: string, columnId: number, cardId: number, columnIndex: number) => void;
     readonly moveCard: (cardId: number, newCard: CardModel, oldColumnId: number) => void;
     readonly moveColumn: (columnId: number, newColumn: ColumnModel, oldBoardIndex: number) => void;
+    readonly getColumnsAndCards: () => Promise<void>;
 }
 
 declare interface IDraggableColumn {
@@ -54,6 +55,7 @@ export function Column(props: IColumnProps) {
     const [columnIndex, setColumnIndex] = useState(props.cardCount);
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
     const [displayFirstPlaceholderCard, setDisplayFirstPlaceholderCard] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const columnIdAsString = props.columnId.toString();
 
@@ -135,11 +137,21 @@ export function Column(props: IColumnProps) {
         }
     })
 
-    const addCard = (title: string) => {
+    const addCard = async (title: string) => {
         if (title.length > 0) {
-            setCardTitle('');
-            props.setParentCards(title, props.columnId, Date.now(), columnIndex);
-            setColumnIndex(columnIndex + 1);
+            const data = {
+                title,
+                columnId: props.columnId,
+                columnIndex
+            };
+            try {
+                await post('/cards/create', data);
+                await props.getColumnsAndCards();
+                setCardTitle('');
+                setColumnIndex(columnIndex + 1);
+            } finally {
+                setIsLoading(false);
+            }
         }
         setDisplayCard(false);
     };
@@ -210,7 +222,7 @@ export function Column(props: IColumnProps) {
                                     moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
                             )}
                             {displayCard === true &&
-                                <div className='card trello-card'>
+                                <div className='card add-card'>
                                     <TextareaAutosize
                                         type='text'
                                         autoFocus
@@ -225,7 +237,8 @@ export function Column(props: IColumnProps) {
                             <button
                                 type='button'
                                 className='btn add-card-button mt-2'
-                                onClick={() => { if (displayCard === false) setDisplayCard(true) }}>
+                                onClick={() => { if (displayCard === false) setDisplayCard(true) }}
+                                disabled={isLoading === true}>
                                 + Add a card
                             </button>
                         </div>

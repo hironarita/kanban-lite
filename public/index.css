@@ -78,9 +78,14 @@ body {
 }
 
 .trello-card {
-    padding: 5px;
+    padding: 10px;
     margin-bottom: 10px;
     cursor: pointer;
+}
+
+.add-card {
+    padding: 8px;
+    margin-bottom: 10px;
 }
 
 .card-input {

@@ -23,17 +23,23 @@ function App(props: IAppProps) {
 	const [cardIdToHeightMap, setCardIdToHeightMap] = useState(new Map<number, number>());
 	const [isDragInProgress, setIsDragInProgress] = useState(false);
 	const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const getColumnsCardsAndSetState = async () => {
-		const data = await get<ReadonlyArray<IColumn>>('/columns');
-		const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
-		setColumns(columns);
-		const colIds = columns
-			.map(x => x.Id)
-			.join(',');
-		const cardData = await get<ReadonlyArray<ICard>>('/cards?columnIds=' + colIds);
-		const cards = cardData.map(x => new CardModel(x.id, x.title, x.column_id, x.columnIndex));
-		setCards(cards);
+		setIsLoading(true);
+		try {
+			const data = await get<ReadonlyArray<IColumn>>('/columns');
+			const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
+			setColumns(columns);
+			const colIds = columns
+				.map(x => x.Id)
+				.join(',');
+			const cardData = await get<ReadonlyArray<ICard>>('/cards?columnIds=' + colIds);
+			const cards = cardData.map(x => new CardModel(x.id, x.title, x.column_id, x.columnIndex));
+			setCards(cards);
+		} finally {
+			setIsLoading(false)
+		}
 	};
 
 	useEffect(() => {
@@ -51,11 +57,6 @@ function App(props: IAppProps) {
 	const dragColumnHeight = useMemo(() => columnIdToHeightMap.get(dragColumnId)!, [columnIdToHeightMap, dragColumnId]);
 
 	const dragCardHeight = useMemo(() => cardIdToHeightMap.get(dragCardId)!, [cardIdToHeightMap, dragCardId]);
-
-	const setParentCards = (title: string, columnId: number, cardId: number, columnIndex: number) => {
-		const card = new CardModel(cardId, title, columnId, columnIndex);
-		setCards(cards.concat([card]));
-	};
 
 	const moveCard = (oldCardId: number, newCard: CardModel, oldColumnId: number) => {
 		const clonedCards = cards.slice();
@@ -136,7 +137,12 @@ function App(props: IAppProps) {
 				? <div>
 					<div className='d-flex mt-3'>
 						<h1 className='logged-in-logo'>Kanban Lite</h1>
-						<button className='btn log-out-btn' onClick={() => logout()}>Log Out</button>
+						<button
+							className='btn log-out-btn'
+							onClick={() => logout()}
+							disabled={isLoading === true}>
+							Log Out
+						</button>
 					</div>
 					<DndProvider backend={Backend}>
 						<div className='trello-container'>
@@ -161,16 +167,17 @@ function App(props: IAppProps) {
 										setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
 										changeColumnTitle={(columnId: number, newTitle: string) => changeColumnTitle(columnId, newTitle)}
 										setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
-										setParentCards={(title: string, columnId: number, cardId: number, columnIndex: number) => setParentCards(title, columnId, cardId, columnIndex)}
 										moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
-										moveColumn={(oldColumnId: number, newColumn: ColumnModel, oldBoardIndex: number) => moveColumn(oldColumnId, newColumn, oldBoardIndex)} />
+										moveColumn={(oldColumnId: number, newColumn: ColumnModel, oldBoardIndex: number) => moveColumn(oldColumnId, newColumn, oldBoardIndex)}
+										getColumnsAndCards={() => getColumnsCardsAndSetState()} />
 								</div>
 							)}
 							<div>
 								<button
 									type='button'
 									onClick={() => addColumn()}
-									className='btn add-column-button'>
+									className='btn add-column-button'
+									disabled={isLoading === true}>
 									+ Add another list
 								</button>
 							</div>
