@@ -26,26 +26,26 @@ function App(props: IAppProps) {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const getColumnsCardsAndSetState = async () => {
-		setIsLoading(true);
-		try {
-			const data = await get<ReadonlyArray<IColumn>>('/columns');
-			const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
-			setColumns(columns);
-			const colIds = columns
-				.map(x => x.Id)
-				.join(',');
-			const cardData = await get<ReadonlyArray<ICard>>('/cards?columnIds=' + colIds);
-			const cards = cardData.map(x => new CardModel(x.id, x.title, x.column_id, x.columnIndex));
-			setCards(cards);
-		} finally {
-			setIsLoading(false)
-		}
+		const data = await get<ReadonlyArray<IColumn>>('/columns');
+		const columns = data.map(x => new ColumnModel(x.id, x.title, x.boardIndex));
+		setColumns(columns);
+		const colIds = columns
+			.map(x => x.Id)
+			.join(',');
+		const cardData = await get<ReadonlyArray<ICard>>('/cards?columnIds=' + colIds);
+		const cards = cardData.map(x => new CardModel(x.id, x.title, x.column_id, x.columnIndex));
+		setCards(cards);
 	};
 
 	useEffect(() => {
 		(async () => {
 			if (isLoggedIn === true) {
-				await getColumnsCardsAndSetState();
+				setIsLoading(true);
+				try {
+					await getColumnsCardsAndSetState();
+				} finally {
+					setIsLoading(false);
+				}
 			}
 		})();
 	}, [isLoggedIn]);
@@ -85,8 +85,13 @@ function App(props: IAppProps) {
 			title: '',
 			boardIndex: columns.length
 		};
-		await post('/columns/create', data);
-		await getColumnsCardsAndSetState();
+		setIsLoading(true);
+		try {
+			await post('/columns/create', data);
+			await getColumnsCardsAndSetState();
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const changeColumnTitle = async (id: number, newTitle: string) => {
@@ -94,8 +99,13 @@ function App(props: IAppProps) {
 			id,
 			title: newTitle
 		};
-		await post('/columns/update', data);
-		await getColumnsCardsAndSetState();
+		setIsLoading(true)
+		try {
+			await post('/columns/update', data);
+			await getColumnsCardsAndSetState();
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const moveColumn = async (oldColumnId: number, newColumn: ColumnModel, oldBoardIndex: number) => {
@@ -110,8 +120,13 @@ function App(props: IAppProps) {
 		for (let i = 0; i < newColumns.length; i++) {
 			data = { ...data, [newColumns[i].Id]: newColumns[i].BoardIndex };
 		}
-		await post('/columns/move', data);
-		await getColumnsCardsAndSetState();
+		setIsLoading(true);
+		try {
+			await post('/columns/move', data);
+			await getColumnsCardsAndSetState();
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const setColumnHeight = (columnId: number, height: number) => {
@@ -127,8 +142,13 @@ function App(props: IAppProps) {
 	}, [cardIdToHeightMap]);
 
 	const logout = async () => {
-		await get('/account/logout');
-		setIsLoggedIn(false);
+		setIsLoading(true)
+		try {
+			await get('/account/logout');
+			setIsLoggedIn(false);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
@@ -169,7 +189,9 @@ function App(props: IAppProps) {
 										setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
 										moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
 										moveColumn={(oldColumnId: number, newColumn: ColumnModel, oldBoardIndex: number) => moveColumn(oldColumnId, newColumn, oldBoardIndex)}
-										getColumnsAndCards={() => getColumnsCardsAndSetState()} />
+										getColumnsAndCards={() => getColumnsCardsAndSetState()}
+										setIsLoading={(x: boolean) => setIsLoading(x)}
+										isLoading={isLoading} />
 								</div>
 							)}
 							<div>

@@ -21,6 +21,7 @@ declare interface IColumnProps {
     readonly dragCardHeight: number;
     readonly isDragInProgress: boolean;
     readonly cards: ReadonlyArray<CardModel>;
+    readonly isLoading: boolean;
     readonly setIsDragInProgress: (x: boolean) => void;
     readonly setDragCardId: (cardId: number) => void;
     readonly setCardHeight: (cardId: number, height: number) => void;
@@ -31,6 +32,7 @@ declare interface IColumnProps {
     readonly moveCard: (cardId: number, newCard: CardModel, oldColumnId: number) => void;
     readonly moveColumn: (columnId: number, newColumn: ColumnModel, oldBoardIndex: number) => void;
     readonly getColumnsAndCards: () => Promise<void>;
+    readonly setIsLoading: (x: boolean) => void;
 }
 
 declare interface IDraggableColumn {
@@ -55,7 +57,6 @@ export function Column(props: IColumnProps) {
     const [columnIndex, setColumnIndex] = useState(props.cardCount);
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
     const [displayFirstPlaceholderCard, setDisplayFirstPlaceholderCard] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
 
     const columnIdAsString = props.columnId.toString();
 
@@ -144,13 +145,14 @@ export function Column(props: IColumnProps) {
                 columnId: props.columnId,
                 columnIndex
             };
+            props.setIsLoading(true);
             try {
                 await post('/cards/create', data);
                 await props.getColumnsAndCards();
                 setCardTitle('');
                 setColumnIndex(columnIndex + 1);
             } finally {
-                setIsLoading(false);
+                props.setIsLoading(false);
             }
         }
         setDisplayCard(false);
@@ -166,8 +168,9 @@ export function Column(props: IColumnProps) {
         }
     };
 
-    const handleKeyDownForCard = (key: string) => {
-        if (key === 'Enter') {
+    const handleKeyDownForCard = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
             addCard(cardTitle);
         }
     };
@@ -230,7 +233,7 @@ export function Column(props: IColumnProps) {
                                         value={cardTitle}
                                         placeholder='Enter a title for this card...'
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChangeForCard(e.target.value)}
-                                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDownForCard(e.key)}
+                                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDownForCard(e)}
                                         onBlur={() => handleOnBlurForCard()} />
                                 </div>
                             }
@@ -238,7 +241,7 @@ export function Column(props: IColumnProps) {
                                 type='button'
                                 className='btn add-card-button mt-2'
                                 onClick={() => { if (displayCard === false) setDisplayCard(true) }}
-                                disabled={isLoading === true}>
+                                disabled={props.isLoading === true}>
                                 + Add a card
                             </button>
                         </div>
