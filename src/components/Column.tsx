@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
+import { getEmptyImage } from 'react-dnd-html5-backend'
 import { Card, IDraggableCard } from './Card';
 import { CardModel } from '../models/Card';
 import { ColumnModel } from '../models/Column';
@@ -35,11 +36,12 @@ declare interface IColumnProps {
     readonly setIsLoading: (x: boolean) => void;
 }
 
-declare interface IDraggableColumn {
+export interface IDraggableColumn {
     readonly type: string;
     readonly title: string;
     readonly columnId: number;
     readonly boardIndex: number;
+    readonly cards: ReadonlyArray<CardModel>;
 }
 
 export function Column(props: IColumnProps) {
@@ -72,8 +74,14 @@ export function Column(props: IColumnProps) {
         .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
 
 
-    const [, drag] = useDrag({
-        item: { type: 'column', title: columnTitle, columnId: props.columnId, boardIndex: props.boardIndex },
+    const [, drag, preview] = useDrag({
+        item: {
+            type: 'column',
+            title: columnTitle,
+            columnId: props.columnId,
+            boardIndex: props.boardIndex,
+            cards: filteredCards
+        },
         collect: monitor => {
             if (monitor.isDragging()) {
                 if (columnRef.current != null) {
@@ -95,6 +103,10 @@ export function Column(props: IColumnProps) {
         },
         end: () => props.setIsDragInProgress(false)
     });
+
+    useEffect(() => {
+        preview(getEmptyImage(), { captureDraggingState: true });
+    }, [preview]);
 
     const [, drop] = useDrop({
         accept: ['column', 'card'],
@@ -136,7 +148,7 @@ export function Column(props: IColumnProps) {
                 setDisplayFirstPlaceholderCard(true);
             }
         }
-    })
+    });
 
     const addCard = async (title: string) => {
         if (title.length > 0) {

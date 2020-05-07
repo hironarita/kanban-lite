@@ -211,3 +211,16 @@ body {
         animation: octocat-wave 560ms ease-in-out
     }
 }
+
+.custom-drag-layer-container {
+    position: fixed;
+    pointer-events: none;
+    z-index: 100;
+    left: 0;
+    top: 0;
+}
+
+.custom-drag-layer {
+    transform: rotate(7deg);
+    -webkit-transform: rotate(7deg);
+}

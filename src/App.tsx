@@ -9,6 +9,7 @@ import { ModalManager } from './components/ModalManager';
 import { Path } from './utilities/Enums';
 import { LoginSignup } from './components/LoginSignup';
 import { get, post } from './utilities/Axios';
+import { CustomDragLayer } from './components/CustomDragLayer';
 
 declare interface IAppProps {
 	readonly isLoggedIn: boolean;
@@ -165,6 +166,7 @@ function App(props: IAppProps) {
 						</button>
 					</div>
 					<DndProvider backend={Backend}>
+						<CustomDragLayer />
 						<div className='trello-container'>
 							{sortedColumns.map(x =>
 								<div key={x.Id}>
