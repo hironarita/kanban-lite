@@ -15,7 +15,7 @@ declare interface IAppProps {
 }
 function App(props: IAppProps) {
 	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
-	const [columns, setColumns] = useState<ReadonlyArray<IColumn>>([]);
+	const [columns, setColumns] = useState<IColumn[]>([]);
 	const [highlightedColumnId, setHighlightedColumnId] = useState(0);
 	const [columnIdToHeightMap, setColumnIdToHeightMap] = useState(new Map<number, number>());
 	const [dragColumnId, setDragColumnId] = useState(0);
@@ -26,7 +26,7 @@ function App(props: IAppProps) {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const getColumnsCardsAndSetState = async () => {
-		const columns = await get<ReadonlyArray<IColumn>>('/columns');
+		const columns = await get<IColumn[]>('/columns');
 		setColumns(columns);
 		const colIds = columns
 			.map(x => x.id)
@@ -49,9 +49,7 @@ function App(props: IAppProps) {
 		})();
 	}, [isLoggedIn]);
 
-	const sortedColumns = columns
-		.slice()
-		.sort((x, y) => x.boardIndex > y.boardIndex ? 1 : -1);
+	const sortedColumns = columns.sort((x, y) => x.boardIndex > y.boardIndex ? 1 : -1);
 
 	const dragColumnHeight = useMemo(() => columnIdToHeightMap.get(dragColumnId)!, [columnIdToHeightMap, dragColumnId]);
 
@@ -108,14 +106,12 @@ function App(props: IAppProps) {
 	};
 
 	const moveColumn = async (oldColumnId: number, newColumn: IColumn, oldBoardIndex: number) => {
-		const clonedColumns = columns
-			.slice()
-			.sort((x, y) => x.boardIndex > y.boardIndex ? 1 : -1);
+		const clonedColumns = columns.sort((x, y) => x.boardIndex > y.boardIndex ? 1 : -1);
 		clonedColumns.splice(newColumn.boardIndex, 0, newColumn);
 		const newColumns = clonedColumns
 			.filter(x => !(x.id === oldColumnId && x.boardIndex === oldBoardIndex))
 			.map((x, i) => ({ ...x, boardIndex: i}));
-		setColumns(newColumns)
+		setColumns(newColumns);
 		let data = {};
 		for (let i = 0; i < newColumns.length; i++) {
 			data = { ...data, [newColumns[i].id]: i };
