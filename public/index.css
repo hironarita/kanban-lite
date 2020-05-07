@@ -224,3 +224,7 @@ body {
     transform: rotate(7deg);
     -webkit-transform: rotate(7deg);
 }
+
+.custom-drag-card {
+    width: 280px;
+}

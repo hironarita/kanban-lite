@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import { CardModel } from '../models/Card';
 
 declare interface ICardProps {
@@ -44,7 +45,7 @@ export function Card(props: ICardProps) {
         }
     }, [props.cardId, isDragging]);
 
-    const [, drag] = useDrag({
+    const [, drag, preview] = useDrag({
         item: { type: 'card', title: props.title, cardId: props.cardId, columnId: props.columnId },
         collect: monitor => {
             if (monitor.isDragging()) setIsDragging(true)
@@ -59,6 +60,10 @@ export function Card(props: ICardProps) {
             props.setHighlightedCardId(props.cardId);
         }
     });
+
+    useEffect(() => {
+        preview(getEmptyImage(), { captureDraggingState: true });
+    }, [preview]);
 
     const [, drop] = useDrop({
         accept: 'card',
