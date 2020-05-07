@@ -118,7 +118,12 @@ function App(props: IAppProps) {
 		for (let i = 0; i < newColumns.length; i++) {
 			data = { ...data, [newColumns[i].id]: i };
 		}
-		await post('/columns/move', data);
+		setIsLoading(true);
+		try {
+			await post('/columns/move', data);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const setColumnHeight = (columnId: number, height: number) => {
@@ -150,7 +155,7 @@ function App(props: IAppProps) {
 					<div className='d-flex mt-3'>
 						<h1 className='logged-in-logo'>Kanban Lite</h1>
 						<button
-							className='btn log-out-btn'
+							className='btn log-out-btn add-logout-btn'
 							onClick={() => logout()}
 							disabled={isLoading === true}>
 							Log Out
@@ -188,7 +193,7 @@ function App(props: IAppProps) {
 								<button
 									type='button'
 									onClick={() => addColumn()}
-									className='btn add-column-button'
+									className='btn add-column-button add-logout-btn'
 									disabled={isLoading === true}>
 									+ Add another list
 								</button>

@@ -247,7 +247,7 @@ export function Column(props: IColumnProps) {
                             }
                             <button
                                 type='button'
-                                className='btn add-card-button mt-2'
+                                className='btn add-card-button mt-2 add-logout-btn'
                                 onClick={() => { if (displayCard === false) setDisplayCard(true) }}
                                 disabled={props.isLoading === true}>
                                 + Add a card

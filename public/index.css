@@ -228,3 +228,7 @@ body {
 .custom-drag-card {
     width: 280px;
 }
+
+.add-logout-btn:disabled {
+    opacity: 1;
+}
