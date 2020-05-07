@@ -106,7 +106,9 @@ function App(props: IAppProps) {
 	};
 
 	const moveColumn = async (oldColumnId: number, newColumn: IColumn, oldBoardIndex: number) => {
-		const clonedColumns = columns.sort((x, y) => x.boardIndex > y.boardIndex ? 1 : -1);
+		const clonedColumns = columns
+			.slice()
+			.sort((x, y) => x.boardIndex > y.boardIndex ? 1 : -1);
 		clonedColumns.splice(newColumn.boardIndex, 0, newColumn);
 		const newColumns = clonedColumns
 			.filter(x => !(x.id === oldColumnId && x.boardIndex === oldBoardIndex))
