@@ -1,21 +1,17 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend'
 import { Card, IDraggableCard } from './Card';
 import { CardModel } from '../models/Card';
-import { ColumnModel } from '../models/Column';
 import { post } from '../utilities/Axios';
 
 declare interface IColumnProps {
-    readonly columnId: number;
-    readonly boardIndex: number;
+    readonly column: IColumn;
 
     /** determines which card is being hovered over */
     readonly highlightedColumnId: number;
 
-    readonly title: string;
-    readonly cardCount: number;
     readonly dragColumnId: number;
     readonly dragColumnHeight: number;
     readonly dragCardId: number;
@@ -31,16 +27,14 @@ declare interface IColumnProps {
     readonly changeColumnTitle: (columnId: number, newTitle: string) => void;
     readonly setHighlightedColumnId: (id: number) => void;
     readonly moveCard: (cardId: number, newCard: CardModel, oldColumnId: number) => void;
-    readonly moveColumn: (columnId: number, newColumn: ColumnModel, oldBoardIndex: number) => void;
+    readonly moveColumn: (columnId: number, newColumn: IColumn, oldBoardIndex: number) => void;
     readonly getColumnsAndCards: () => Promise<void>;
     readonly setIsLoading: (x: boolean) => void;
 }
 
 export interface IDraggableColumn {
     readonly type: string;
-    readonly title: string;
-    readonly columnId: number;
-    readonly boardIndex: number;
+    readonly column: IColumn;
     readonly cards: ReadonlyArray<CardModel>;
 }
 
@@ -52,41 +46,41 @@ export function Column(props: IColumnProps) {
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
     const [highlightedCardId, setHighlightedCardId] = useState(0);
-    const [columnTitle, setColumnTitle] = useState(props.title);
+    const [columnTitle, setColumnTitle] = useState(props.column.title);
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableLeftColumn, setDisplayDroppableLeftColumn] = useState(false);
     const [displayDroppableRightColumn, setDisplayDroppableRightColumn] = useState(false);
-    const [columnIndex, setColumnIndex] = useState(props.cardCount);
+    const [columnIndex, setColumnIndex] = useState(props.cards.length);
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
     const [displayFirstPlaceholderCard, setDisplayFirstPlaceholderCard] = useState(false);
 
-    const columnIdAsString = props.columnId.toString();
+    const columnIdAsString = props.column.id.toString();
 
-    useEffect(() => setColumnIndex(props.cardCount), [props.cardCount]);
+    useEffect(() => setColumnIndex(props.cards.length), [props.cards]);
 
     useEffect(() => {
-        const height = window.innerHeight - document.getElementById(columnIdAsString)!.getBoundingClientRect().bottom - 40;
-        setInvisibleColumnHeight(height);
-    }, [displayCard, columnIdAsString]);
+        const el = document.getElementById(columnIdAsString);
+        if (el != null) {
+            const height = window.innerHeight - el.getBoundingClientRect().bottom - 40;
+            setInvisibleColumnHeight(height);
+        }
+    }, [columnIdAsString, props.cards]);
 
-    const filteredCards = useMemo(() => props.cards
-        .filter(x => x.ColumnId === props.columnId)
-        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1), [props.cards, props.columnId]);
-
+    const sortedCards = props.cards
+        .slice()
+        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1);
 
     const [, drag, preview] = useDrag({
         item: {
             type: 'column',
-            title: columnTitle,
-            columnId: props.columnId,
-            boardIndex: props.boardIndex,
-            cards: filteredCards
+            column: props.column,
+            cards: sortedCards
         },
         collect: monitor => {
             if (monitor.isDragging()) {
                 if (columnRef.current != null) {
                     const columnHeight = columnRef.current.clientHeight;
-                    props.setColumnHeight(props.columnId, columnHeight);
+                    props.setColumnHeight(props.column.id, columnHeight);
                 }
                 setIsDragging(true);
                 props.setIsDragInProgress(true);
@@ -98,8 +92,8 @@ export function Column(props: IColumnProps) {
             }
         },
         begin: () => {
-            props.setHighlightedColumnId(props.columnId);
-            props.setDragColumnId(props.columnId);
+            props.setHighlightedColumnId(props.column.id);
+            props.setDragColumnId(props.column.id);
         },
         end: () => props.setIsDragInProgress(false)
     });
@@ -112,16 +106,18 @@ export function Column(props: IColumnProps) {
         accept: ['column', 'card'],
         drop: (item: IDraggableColumn | IDraggableCard) => {
             if (item.type === 'column') {
+                const col = (item as IDraggableColumn).column;
                 const boardIndex = displayDroppableLeftColumn === true
-                    ? props.boardIndex
-                    : props.boardIndex + 1;
-                const newColumn = new ColumnModel(item.columnId, item.title, boardIndex);
-                props.moveColumn(item.columnId, newColumn, (item as IDraggableColumn).boardIndex);
+                    ? props.column.boardIndex
+                    : props.column.boardIndex + 1;
+                let newColumn = { ...col };
+                newColumn = { ...newColumn, boardIndex };
+                props.moveColumn(col.id, newColumn, col.boardIndex);
             }
 
             if (item.type === 'card') {
-                const newCard = new CardModel((item as IDraggableCard).cardId, item.title, props.columnId, 0);
-                props.moveCard((item as IDraggableCard).cardId, newCard, item.columnId);
+                const newCard = new CardModel((item as IDraggableCard).cardId, (item as IDraggableCard).title, props.column.id, 0);
+                props.moveCard((item as IDraggableCard).cardId, newCard, (item as IDraggableCard).columnId);
             }
         },
         collect: monitor => {
@@ -131,7 +127,7 @@ export function Column(props: IColumnProps) {
         },
         hover: (item, monitor) => {
             if (item.type === 'column') {
-                if (monitor.isOver()) props.setHighlightedColumnId(props.columnId);
+                if (monitor.isOver()) props.setHighlightedColumnId(props.column.id);
 
                 const initialOffset = monitor.getInitialClientOffset();
                 if (monitor.getClientOffset()!.x < initialOffset!.x) {
@@ -154,7 +150,7 @@ export function Column(props: IColumnProps) {
         if (title.length > 0) {
             const data = {
                 title,
-                columnId: props.columnId,
+                columnId: props.column.id,
                 columnIndex
             };
             props.setIsLoading(true);
@@ -200,7 +196,7 @@ export function Column(props: IColumnProps) {
 
     return (
         <div ref={ref} className='d-flex'>
-            {displayDroppableLeftColumn === true && props.highlightedColumnId === props.columnId && isDragging === false &&
+            {displayDroppableLeftColumn === true && props.highlightedColumnId === props.column.id && isDragging === false &&
                 <div style={{ height: props.dragColumnHeight }} className='column droppable-column'></div>
             }
             <div>
@@ -216,17 +212,17 @@ export function Column(props: IColumnProps) {
                                     placeholder='Enter list title...'
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)}
-                                    onBlur={() => props.changeColumnTitle(props.columnId, columnTitle)} />
+                                    onBlur={() => props.changeColumnTitle(props.column.id, columnTitle)} />
                             </div>
-                            {filteredCards.length <= 1 && displayFirstPlaceholderCard === true &&
+                            {sortedCards.length <= 1 && displayFirstPlaceholderCard === true &&
                                 <div style={{ height: props.dragCardHeight }} className='card trello-card placeholder-card'></div>
                             }
-                            {filteredCards.map((x, i) =>
+                            {sortedCards.map((x, i) =>
                                 <Card
                                     key={i}
                                     title={x.Title}
                                     cardId={x.Id}
-                                    columnId={props.columnId}
+                                    columnId={props.column.id}
                                     columnIndex={x.ColumnIndex}
                                     highlightedCardId={highlightedCardId}
                                     dragCardHeight={props.dragCardHeight}
@@ -257,7 +253,7 @@ export function Column(props: IColumnProps) {
                                 + Add a card
                             </button>
                         </div>
-                        {props.dragColumnId !== props.columnId && props.isDragInProgress === true &&
+                        {props.dragColumnId !== props.column.id && props.isDragInProgress === true &&
                             <div style={{ height: invisibleColumnHeight }} className='invisible-column'></div>
                         }
                     </div>
@@ -266,7 +262,7 @@ export function Column(props: IColumnProps) {
                     <div style={{ height: props.dragColumnHeight }} className='placeholder-column'></div>
                 }
             </div>
-            {displayDroppableRightColumn === true && props.highlightedColumnId === props.columnId && isDragging === false &&
+            {displayDroppableRightColumn === true && props.highlightedColumnId === props.column.id && isDragging === false &&
                 <div style={{ height: props.dragColumnHeight }} className='column droppable-column'></div>
             }
         </div>

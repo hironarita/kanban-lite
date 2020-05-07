@@ -2,6 +2,7 @@ import React from 'react';
 import { useDragLayer, XYCoord } from 'react-dnd';
 import TextareaAutosize from 'react-textarea-autosize';
 import { IDraggableColumn } from './Column';
+import { IDraggableCard } from './Card';
 
 export const CustomDragLayer = () => {
     const getItemStyles = (initialOffset: XYCoord | null, currentOffset: XYCoord | null) => {
@@ -33,7 +34,7 @@ export const CustomDragLayer = () => {
     } = useDragLayer(monitor => ({
         initialOffset: monitor.getInitialSourceClientOffset(),
         currentOffset: monitor.getSourceClientOffset(),
-        item: monitor.getItem() as IDraggableColumn,
+        item: monitor.getItem() as IDraggableColumn | IDraggableCard,
         itemType: monitor.getItemType()
     }));
 
@@ -45,18 +46,14 @@ export const CustomDragLayer = () => {
                         <TextareaAutosize
                             type='text'
                             className='column-title'
-                            defaultValue={item.title}
+                            defaultValue={(item as IDraggableColumn).column.title}
                             placeholder='Enter list title...' />
                     </div>
-                    {item.cards
-                        .slice()
-                        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1)
-                        .map(x => (
-                            <div key={x.Id} className='card trello-card'>
-                                <span>{x.Title}</span>
-                            </div>
-                        ))
-                    }
+                    {(item as IDraggableColumn).cards.map(x => (
+                        <div key={x.Id} className='card trello-card'>
+                            <span>{x.Title}</span>
+                        </div>
+                    ))}
                     <button
                         type='button'
                         className='btn add-card-button mt-2'>
@@ -65,7 +62,7 @@ export const CustomDragLayer = () => {
                 </div>;
             case 'card':
                 return <div className='card trello-card custom-drag-layer custom-drag-card'>
-                    <span>{item.title}</span>
+                    <span>{(item as IDraggableCard).title}</span>
                 </div>;
             default:
                 return null;
