@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
@@ -16,6 +16,7 @@ function App(props: IAppProps) {
 	const [cards, setCards] = useState<ICard[]>([]);
 	const [columns, setColumns] = useState<IColumn[]>([]);
 	const [highlightedColumnId, setHighlightedColumnId] = useState(0);
+	const [highlightedCardId, setHighlightedCardId] = useState(0);
 	const [columnIdToHeightMap, setColumnIdToHeightMap] = useState(new Map<number, number>());
 	const [dragColumnId, setDragColumnId] = useState(0);
 	const [dragCardId, setDragCardId] = useState(0);
@@ -68,7 +69,7 @@ function App(props: IAppProps) {
 
 	const moveCard = async (newCard: ICard, oldCard: ICard) => {
 		const clonedCards = cards.slice();
-		
+
 		const newColumnCards = clonedCards
 			.filter(x => x.column_id === newCard.column_id)
 			.sort((x, y) => x.columnIndex > y.columnIndex ? 1 : -1);
@@ -84,6 +85,7 @@ function App(props: IAppProps) {
 		if (newCard.column_id !== oldCard.column_id) {
 			resetCards = allCardsExceptOldCard
 				.filter(x => x.column_id === oldCard.column_id && x.id !== oldCard.id)
+				.sort((x, y) => x.columnIndex > y.columnIndex ? 1 : -1)
 				.map((x, i) => ({ ...x, columnIndex: i }));
 		}
 
@@ -139,7 +141,7 @@ function App(props: IAppProps) {
 		clonedColumns.splice(newColumn.boardIndex, 0, newColumn);
 		const newColumns = clonedColumns
 			.filter(x => !(x.id === oldColumnId && x.boardIndex === oldBoardIndex))
-			.map((x, i) => ({ ...x, boardIndex: i}));
+			.map((x, i) => ({ ...x, boardIndex: i }));
 		setColumns(newColumns);
 		let data = {};
 		for (let i = 0; i < newColumns.length; i++) {
@@ -160,11 +162,11 @@ function App(props: IAppProps) {
 		setColumnIdToHeightMap(clone);
 	};
 
-	const setCardHeight = useCallback((cardId: number, height: number) => {
+	const setCardHeight = (cardId: number, height: number) => {
 		const clone = new Map(cardIdToHeightMap);
 		clone.set(cardId, height);
 		setCardIdToHeightMap(clone);
-	}, [cardIdToHeightMap]);
+	};
 
 	const logout = async () => {
 		setIsLoading(true)
@@ -197,6 +199,7 @@ function App(props: IAppProps) {
 									<Column
 										column={x}
 										highlightedColumnId={highlightedColumnId}
+										highlightedCardId={highlightedCardId}
 										dragColumnId={dragColumnId}
 										dragColumnHeight={dragColumnHeight}
 										dragCardId={dragCardId}
@@ -210,6 +213,7 @@ function App(props: IAppProps) {
 										setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
 										changeColumnTitle={(columnId: number, newTitle: string) => changeColumnTitle(columnId, newTitle)}
 										setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
+										setHighlightedCardId={(id: number) => setHighlightedCardId(id)}
 										moveCard={(newCard: ICard, oldCard: ICard) => moveCard(newCard, oldCard)}
 										moveColumn={(oldColumnId: number, newColumn: IColumn, oldBoardIndex: number) => moveColumn(oldColumnId, newColumn, oldBoardIndex)}
 										getColumnsAndCards={() => getColumnsCardsAndSetState()}

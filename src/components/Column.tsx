@@ -9,8 +9,11 @@ import TrashIcon from '../images/trash.svg';
 declare interface IColumnProps {
     readonly column: IColumn;
 
-    /** determines which card is being hovered over */
+    /** determines which column is being hovered over */
     readonly highlightedColumnId: number;
+
+    /** determines which card is being hovered over */
+    readonly highlightedCardId: number;
 
     readonly dragColumnId: number;
     readonly dragColumnHeight: number;
@@ -26,6 +29,7 @@ declare interface IColumnProps {
     readonly setColumnHeight: (columnId: number, height: number) => void;
     readonly changeColumnTitle: (columnId: number, newTitle: string) => void;
     readonly setHighlightedColumnId: (id: number) => void;
+    readonly setHighlightedCardId: (id: number) => void;
     readonly moveCard: (newCard: ICard, oldCard: ICard) => void;
     readonly moveColumn: (columnId: number, newColumn: IColumn, oldBoardIndex: number) => void;
     readonly getColumnsAndCards: () => Promise<void>;
@@ -45,7 +49,6 @@ export function Column(props: IColumnProps) {
 
     const [displayCard, setDisplayCard] = useState(false);
     const [cardTitle, setCardTitle] = useState('');
-    const [highlightedCardId, setHighlightedCardId] = useState(0);
     const [columnTitle, setColumnTitle] = useState(props.column.title);
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableLeftColumn, setDisplayDroppableLeftColumn] = useState(false);
@@ -121,9 +124,9 @@ export function Column(props: IColumnProps) {
             }
         },
         collect: monitor => {
-            monitor.isOver()
-                ? setHighlightedCardId(0)
-                : setDisplayFirstPlaceholderCard(false);
+            if (monitor.isOver() === false) {
+                setDisplayFirstPlaceholderCard(false)
+            }
         },
         hover: (item, monitor) => {
             if (item.type === 'column') {
@@ -222,12 +225,12 @@ export function Column(props: IColumnProps) {
                                 <Card
                                     key={i}
                                     card={x}
-                                    highlightedCardId={highlightedCardId}
+                                    highlightedCardId={props.highlightedCardId}
                                     dragCardHeight={props.dragCardHeight}
                                     dragCardId={props.dragCardId}
                                     setDragCardId={(cardId: number) => props.setDragCardId(cardId)}
                                     setCardHeight={(cardId: number, height: number) => props.setCardHeight(cardId, height)}
-                                    setHighlightedCardId={(id) => setHighlightedCardId(id)}
+                                    setHighlightedCardId={(id) => props.setHighlightedCardId(id)}
                                     moveCard={(newCard: ICard, oldCard: ICard) => props.moveCard(newCard, oldCard)} />
                             )}
                             {displayCard === true &&

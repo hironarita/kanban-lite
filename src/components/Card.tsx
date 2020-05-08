@@ -24,26 +24,21 @@ export interface IDraggableCard {
 export function Card(props: ICardProps) {
     const ref = useRef(null);
     const cardRef = useRef<any>(null);
-    const latestSetCardHeight = useRef(props.setCardHeight);
 
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableCardAbove, setDisplayDroppableCardAbove] = useState(false);
     const [displayDroppableCardBelow, setDisplayDroppableCardBelow] = useState(false);
 
-    useEffect(() => { latestSetCardHeight.current = props.setCardHeight });
-
-    useEffect(() => {
-        if (isDragging === false) {
-            const cardHeight = cardRef.current.clientHeight;
-            latestSetCardHeight.current(props.card.id, cardHeight);
-        }
-    }, [props.card.id, isDragging]);
-
     const [, drag, preview] = useDrag({
         item: { type: 'card', card: props.card },
         collect: monitor => {
-            if (monitor.isDragging()) setIsDragging(true)
-            else {
+            if (monitor.isDragging()) {
+                if (cardRef.current != null) {
+                    const cardHeight = cardRef.current.clientHeight;
+                    props.setCardHeight(props.card.id, cardHeight);
+                }
+                setIsDragging(true);
+            } else {
                 setIsDragging(false);
                 setDisplayDroppableCardAbove(false);
                 setDisplayDroppableCardBelow(false);
