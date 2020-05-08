@@ -3,7 +3,6 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend'
 import { Card, IDraggableCard } from './Card';
-import { CardModel } from '../models/Card';
 import { post } from '../utilities/Axios';
 
 declare interface IColumnProps {
@@ -17,7 +16,7 @@ declare interface IColumnProps {
     readonly dragCardId: number;
     readonly dragCardHeight: number;
     readonly isDragInProgress: boolean;
-    readonly cards: ReadonlyArray<CardModel>;
+    readonly cards: ICard[];
     readonly isLoading: boolean;
     readonly setIsDragInProgress: (x: boolean) => void;
     readonly setDragCardId: (cardId: number) => void;
@@ -26,7 +25,7 @@ declare interface IColumnProps {
     readonly setColumnHeight: (columnId: number, height: number) => void;
     readonly changeColumnTitle: (columnId: number, newTitle: string) => void;
     readonly setHighlightedColumnId: (id: number) => void;
-    readonly moveCard: (cardId: number, newCard: CardModel, oldColumnId: number) => void;
+    readonly moveCard: (cardId: number, newCard: ICard, oldColumnId: number) => void;
     readonly moveColumn: (columnId: number, newColumn: IColumn, oldBoardIndex: number) => void;
     readonly getColumnsAndCards: () => Promise<void>;
     readonly setIsLoading: (x: boolean) => void;
@@ -35,7 +34,7 @@ declare interface IColumnProps {
 export interface IDraggableColumn {
     readonly type: string;
     readonly column: IColumn;
-    readonly cards: ReadonlyArray<CardModel>;
+    readonly cards: ICard[];
 }
 
 export function Column(props: IColumnProps) {
@@ -66,9 +65,7 @@ export function Column(props: IColumnProps) {
         }
     }, [columnIdAsString, props.cards]);
 
-    const sortedCards = props.cards
-        .slice()
-        .sort((x, y) => x.ColumnIndex > y.ColumnIndex ? 1 : -1);
+    const sortedCards = props.cards.sort((x, y) => x.column_id > y.column_id ? 1 : -1);
 
     const [, drag, preview] = useDrag({
         item: {
@@ -116,8 +113,10 @@ export function Column(props: IColumnProps) {
             }
 
             if (item.type === 'card') {
-                const newCard = new CardModel((item as IDraggableCard).cardId, (item as IDraggableCard).title, props.column.id, 0);
-                props.moveCard((item as IDraggableCard).cardId, newCard, (item as IDraggableCard).columnId);
+                const card = (item as IDraggableCard).card;
+                let newCard = { ...card }
+                newCard = { ...newCard, column_id: props.column.id, columnIndex: 0 };
+                props.moveCard(card.id, newCard, card.column_id);
             }
         },
         collect: monitor => {
@@ -220,17 +219,14 @@ export function Column(props: IColumnProps) {
                             {sortedCards.map((x, i) =>
                                 <Card
                                     key={i}
-                                    title={x.Title}
-                                    cardId={x.Id}
-                                    columnId={props.column.id}
-                                    columnIndex={x.ColumnIndex}
+                                    card={x}
                                     highlightedCardId={highlightedCardId}
                                     dragCardHeight={props.dragCardHeight}
                                     dragCardId={props.dragCardId}
                                     setDragCardId={(cardId: number) => props.setDragCardId(cardId)}
                                     setCardHeight={(cardId: number, height: number) => props.setCardHeight(cardId, height)}
                                     setHighlightedCardId={(id) => setHighlightedCardId(id)}
-                                    moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
+                                    moveCard={(oldCardId: number, newCard: ICard, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
                             )}
                             {displayCard === true &&
                                 <div className='card add-card'>

@@ -1,14 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { CardModel } from '../models/Card';
 
 declare interface ICardProps {
-    readonly title: string;
-    readonly cardId: number;
-    readonly columnId: number;
+    readonly card: ICard;
     readonly dragCardHeight: number;
-    readonly columnIndex: number;
     readonly dragCardId: number;
 
     /** determines which card is being hovered over */
@@ -16,15 +12,13 @@ declare interface ICardProps {
 
     readonly setDragCardId: (cardId: number) => void;
     readonly setCardHeight: (cardId: number, height: number) => void;
-    readonly moveCard: (cardId: number, newCard: CardModel, columnId: number) => void;
+    readonly moveCard: (cardId: number, newCard: ICard, columnId: number) => void;
     readonly setHighlightedCardId: (cardId: number) => void;
 }
 
 export interface IDraggableCard {
     readonly type: string;
-    readonly title: string;
-    readonly cardId: number;
-    readonly columnId: number;
+    readonly card: ICard;
 }
 
 export function Card(props: ICardProps) {
@@ -41,12 +35,12 @@ export function Card(props: ICardProps) {
     useEffect(() => {
         if (isDragging === false) {
             const cardHeight = cardRef.current.clientHeight;
-            latestSetCardHeight.current(props.cardId, cardHeight);
+            latestSetCardHeight.current(props.card.id, cardHeight);
         }
-    }, [props.cardId, isDragging]);
+    }, [props.card.id, isDragging]);
 
     const [, drag, preview] = useDrag({
-        item: { type: 'card', title: props.title, cardId: props.cardId, columnId: props.columnId },
+        item: { type: 'card', card: props.card },
         collect: monitor => {
             if (monitor.isDragging()) setIsDragging(true)
             else {
@@ -56,8 +50,8 @@ export function Card(props: ICardProps) {
             }
         },
         begin: () => {
-            props.setDragCardId(props.cardId);
-            props.setHighlightedCardId(props.cardId);
+            props.setDragCardId(props.card.id);
+            props.setHighlightedCardId(props.card.id);
         }
     });
 
@@ -68,14 +62,16 @@ export function Card(props: ICardProps) {
     const [, drop] = useDrop({
         accept: 'card',
         drop: (item: IDraggableCard) => {
-            const colIndex = displayDroppableCardAbove === true
-                ? props.columnIndex - 1
-                : props.columnIndex + 1;
-            const newCard = new CardModel(item.cardId, item.title, props.columnId, colIndex);
-            props.moveCard(item.cardId, newCard, item.columnId);
+            const card = item.card;
+            const columnIndex = displayDroppableCardAbove === true
+                ? props.card.columnIndex
+                : props.card.columnIndex + 1;
+            let newCard = { ...card };
+            newCard = { ...card, column_id: props.card.column_id, columnIndex };
+            props.moveCard(card.id, newCard, card.column_id);
         },
         hover: (_item, monitor) => {
-            if (monitor.isOver()) props.setHighlightedCardId(props.cardId);
+            if (monitor.isOver()) props.setHighlightedCardId(props.card.id);
 
             const initialOffset = monitor.getInitialClientOffset();
             if (monitor.getClientOffset()!.y < initialOffset!.y) {
@@ -94,18 +90,18 @@ export function Card(props: ICardProps) {
 
     return (
         <div ref={ref}>
-            {displayDroppableCardAbove === true && props.highlightedCardId === props.cardId && isDragging === false &&
+            {displayDroppableCardAbove === true && props.highlightedCardId === props.card.id && isDragging === false &&
                 <div style={{ height: props.dragCardHeight }} className='card trello-card droppable-card'></div>
             }
             {isDragging === false &&
                 <div ref={cardRef} className='card trello-card'>
-                    <span>{isDragging === false && props.title}</span>
+                    <span>{isDragging === false && props.card.title}</span>
                 </div>
             }
             {isDragging === true && props.highlightedCardId === props.dragCardId &&
                 <div style={{ height: props.dragCardHeight }} className='card trello-card placeholder-card'></div>
             }
-            {displayDroppableCardBelow === true && props.highlightedCardId === props.cardId && isDragging === false &&
+            {displayDroppableCardBelow === true && props.highlightedCardId === props.card.id && isDragging === false &&
                 <div style={{ height: props.dragCardHeight }} className='card trello-card droppable-card'></div>
             }
         </div>

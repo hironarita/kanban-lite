@@ -50,8 +50,8 @@ export const CustomDragLayer = () => {
                             placeholder='Enter list title...' />
                     </div>
                     {(item as IDraggableColumn).cards.map(x => (
-                        <div key={x.Id} className='card trello-card'>
-                            <span>{x.Title}</span>
+                        <div key={x.id} className='card trello-card'>
+                            <span>{x.title}</span>
                         </div>
                     ))}
                     <button
@@ -62,7 +62,7 @@ export const CustomDragLayer = () => {
                 </div>;
             case 'card':
                 return <div className='card trello-card custom-drag-layer custom-drag-card'>
-                    <span>{(item as IDraggableCard).title}</span>
+                    <span>{(item as IDraggableCard).card.title}</span>
                 </div>;
             default:
                 return null;

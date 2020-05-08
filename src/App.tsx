@@ -3,7 +3,6 @@ import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Column } from './components/Column';
-import { CardModel } from './models/Card';
 import { ModalManager } from './components/ModalManager';
 import { Path } from './utilities/Enums';
 import { LoginSignup } from './components/LoginSignup';
@@ -14,7 +13,7 @@ declare interface IAppProps {
 	readonly isLoggedIn: boolean;
 }
 function App(props: IAppProps) {
-	const [cards, setCards] = useState<ReadonlyArray<CardModel>>([]);
+	const [cards, setCards] = useState<ICard[]>([]);
 	const [columns, setColumns] = useState<IColumn[]>([]);
 	const [highlightedColumnId, setHighlightedColumnId] = useState(0);
 	const [columnIdToHeightMap, setColumnIdToHeightMap] = useState(new Map<number, number>());
@@ -31,9 +30,13 @@ function App(props: IAppProps) {
 		const colIds = columns
 			.map(x => x.id)
 			.join(',');
-		const cardData = await get<ReadonlyArray<ICard>>('/cards?columnIds=' + colIds);
-		const cards = cardData.map(x => new CardModel(x.id, x.title, x.column_id, x.columnIndex));
+		const cards = await get<ICard[]>('/cards?columnIds=' + colIds);
 		setCards(cards);
+	};
+
+	const getColumnsAndSetState = async () => {
+		const columns = await get<IColumn[]>('/columns');
+		setColumns(columns);
 	};
 
 	useEffect(() => {
@@ -55,26 +58,28 @@ function App(props: IAppProps) {
 
 	const dragCardHeight = useMemo(() => cardIdToHeightMap.get(dragCardId)!, [cardIdToHeightMap, dragCardId]);
 
-	const moveCard = (oldCardId: number, newCard: CardModel, oldColumnId: number) => {
+	const moveCard = (oldCardId: number, newCard: ICard, oldColumnId: number) => {
 		const clonedCards = cards.slice();
-		const allCardsExceptOldCard = clonedCards.filter(x => x.Id !== oldCardId);
+		const allCardsExceptOldCard = clonedCards.filter(x => x.id !== oldCardId);
 
-		const newColumnCards = allCardsExceptOldCard.filter(x => x.ColumnId === newCard.ColumnId);
-		newColumnCards.splice(newCard.ColumnIndex, 0, newCard);
-		const newCards = newColumnCards.map((x, i) => new CardModel(x.Id, x.Title, x.ColumnId, i));
+		const newColumnCards = allCardsExceptOldCard.filter(x => x.column_id === newCard.column_id);
+		newColumnCards.splice(newCard.column_id, 0, newCard);
+		const newCards = newColumnCards.map((x, i) => ({ ...x, columnIndex: i }));
 
 		// reset column indexes on cards in the old column
-		let resetCards: CardModel[] = [];
-		if (newCard.ColumnId !== oldColumnId) {
+		let resetCards: ICard[] = [];
+		if (newCard.column_id !== oldColumnId) {
 			resetCards = allCardsExceptOldCard
-				.filter(x => x.ColumnId === oldColumnId)
-				.map((x, i) => new CardModel(x.Id, x.Title, x.ColumnId, i));
+				.filter(x => x.column_id === oldColumnId)
+				.map((x, i) => ({ ...x, columnIndex: i }));
 		}
 
 		const unchangedCards = allCardsExceptOldCard
-			.filter(x => x.ColumnId !== newCard.ColumnId)
-			.filter(x => x.ColumnId !== oldColumnId);
+			.filter(x => x.column_id !== newCard.column_id)
+			.filter(x => x.column_id !== oldColumnId);
 		setCards(unchangedCards.concat(newCards).concat(resetCards));
+
+		
 	};
 
 	const addColumn = async () => {
@@ -85,7 +90,7 @@ function App(props: IAppProps) {
 		setIsLoading(true);
 		try {
 			await post('/columns/create', data);
-			await getColumnsCardsAndSetState();
+			await getColumnsAndSetState();
 		} finally {
 			setIsLoading(false);
 		}
@@ -99,7 +104,7 @@ function App(props: IAppProps) {
 		setIsLoading(true)
 		try {
 			await post('/columns/update', data);
-			await getColumnsCardsAndSetState();
+			await getColumnsAndSetState();
 		} finally {
 			setIsLoading(false);
 		}
@@ -121,6 +126,7 @@ function App(props: IAppProps) {
 		setIsLoading(true);
 		try {
 			await post('/columns/move', data);
+			await getColumnsAndSetState();
 		} finally {
 			setIsLoading(false);
 		}
@@ -174,7 +180,7 @@ function App(props: IAppProps) {
 										dragCardId={dragCardId}
 										dragCardHeight={dragCardHeight}
 										isDragInProgress={isDragInProgress}
-										cards={cards.filter(y => y.ColumnId === x.id)}
+										cards={cards.filter(y => y.column_id === x.id)}
 										setIsDragInProgress={(x: boolean) => setIsDragInProgress(x)}
 										setCardHeight={(cardId: number, height: number) => setCardHeight(cardId, height)}
 										setDragCardId={(cardId: number) => setDragCardId(cardId)}
@@ -182,7 +188,7 @@ function App(props: IAppProps) {
 										setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
 										changeColumnTitle={(columnId: number, newTitle: string) => changeColumnTitle(columnId, newTitle)}
 										setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
-										moveCard={(oldCardId: number, newCard: CardModel, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
+										moveCard={(oldCardId: number, newCard: ICard, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
 										moveColumn={(oldColumnId: number, newColumn: IColumn, oldBoardIndex: number) => moveColumn(oldColumnId, newColumn, oldBoardIndex)}
 										getColumnsAndCards={() => getColumnsCardsAndSetState()}
 										setIsLoading={(x: boolean) => setIsLoading(x)}
