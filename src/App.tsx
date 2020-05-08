@@ -39,6 +39,14 @@ function App(props: IAppProps) {
 		setColumns(columns);
 	};
 
+	const getCardsAndSetState = async () => {
+		const colIds = columns
+			.map(x => x.id)
+			.join(',');
+		const cards = await get<ICard[]>('/cards?columnIds=' + colIds);
+		setCards(cards);
+	};
+
 	useEffect(() => {
 		(async () => {
 			if (isLoggedIn === true) {
@@ -58,28 +66,42 @@ function App(props: IAppProps) {
 
 	const dragCardHeight = useMemo(() => cardIdToHeightMap.get(dragCardId)!, [cardIdToHeightMap, dragCardId]);
 
-	const moveCard = (oldCardId: number, newCard: ICard, oldColumnId: number) => {
+	const moveCard = async (newCard: ICard, oldCard: ICard) => {
 		const clonedCards = cards.slice();
-		const allCardsExceptOldCard = clonedCards.filter(x => x.id !== oldCardId);
+		
+		const newColumnCards = clonedCards
+			.filter(x => x.column_id === newCard.column_id)
+			.sort((x, y) => x.columnIndex > y.columnIndex ? 1 : -1);
+		newColumnCards.splice(newCard.columnIndex, 0, newCard);
+		const newCards = newColumnCards
+			.filter(x => !(x.id === oldCard.id && x.columnIndex === oldCard.columnIndex && x.column_id === oldCard.column_id))
+			.map((x, i) => ({ ...x, columnIndex: i }));
 
-		const newColumnCards = allCardsExceptOldCard.filter(x => x.column_id === newCard.column_id);
-		newColumnCards.splice(newCard.column_id, 0, newCard);
-		const newCards = newColumnCards.map((x, i) => ({ ...x, columnIndex: i }));
+		const allCardsExceptOldCard = clonedCards.filter(x => !(x.id === oldCard.id && x.columnIndex === oldCard.columnIndex && x.column_id === oldCard.column_id));
 
 		// reset column indexes on cards in the old column
 		let resetCards: ICard[] = [];
-		if (newCard.column_id !== oldColumnId) {
+		if (newCard.column_id !== oldCard.column_id) {
 			resetCards = allCardsExceptOldCard
-				.filter(x => x.column_id === oldColumnId)
+				.filter(x => x.column_id === oldCard.column_id)
 				.map((x, i) => ({ ...x, columnIndex: i }));
 		}
 
 		const unchangedCards = allCardsExceptOldCard
 			.filter(x => x.column_id !== newCard.column_id)
-			.filter(x => x.column_id !== oldColumnId);
+			.filter(x => x.column_id !== oldCard.column_id);
 		setCards(unchangedCards.concat(newCards).concat(resetCards));
 
-		
+		const data = {
+			cardData: newCards.concat(resetCards)
+		};
+		setIsLoading(true)
+		try {
+			await post('/cards/move', data);
+			await getCardsAndSetState();
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const addColumn = async () => {
@@ -188,7 +210,7 @@ function App(props: IAppProps) {
 										setColumnHeight={(columnId: number, height: number) => setColumnHeight(columnId, height)}
 										changeColumnTitle={(columnId: number, newTitle: string) => changeColumnTitle(columnId, newTitle)}
 										setHighlightedColumnId={(id: number) => setHighlightedColumnId(id)}
-										moveCard={(oldCardId: number, newCard: ICard, oldColumnId: number) => moveCard(oldCardId, newCard, oldColumnId)}
+										moveCard={(newCard: ICard, oldCard: ICard) => moveCard(newCard, oldCard)}
 										moveColumn={(oldColumnId: number, newColumn: IColumn, oldBoardIndex: number) => moveColumn(oldColumnId, newColumn, oldBoardIndex)}
 										getColumnsAndCards={() => getColumnsCardsAndSetState()}
 										setIsLoading={(x: boolean) => setIsLoading(x)}

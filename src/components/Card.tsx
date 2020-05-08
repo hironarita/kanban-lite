@@ -12,7 +12,7 @@ declare interface ICardProps {
 
     readonly setDragCardId: (cardId: number) => void;
     readonly setCardHeight: (cardId: number, height: number) => void;
-    readonly moveCard: (cardId: number, newCard: ICard, columnId: number) => void;
+    readonly moveCard: (newCard: ICard, oldCard: ICard) => void;
     readonly setHighlightedCardId: (cardId: number) => void;
 }
 
@@ -62,13 +62,13 @@ export function Card(props: ICardProps) {
     const [, drop] = useDrop({
         accept: 'card',
         drop: (item: IDraggableCard) => {
-            const card = item.card;
+            const oldCard = item.card;
             const columnIndex = displayDroppableCardAbove === true
                 ? props.card.columnIndex
                 : props.card.columnIndex + 1;
-            let newCard = { ...card };
-            newCard = { ...card, column_id: props.card.column_id, columnIndex };
-            props.moveCard(card.id, newCard, card.column_id);
+            let newCard = { ...oldCard };
+            newCard = { ...oldCard, column_id: props.card.column_id, columnIndex };
+            props.moveCard(newCard, oldCard);
         },
         hover: (_item, monitor) => {
             if (monitor.isOver()) props.setHighlightedCardId(props.card.id);

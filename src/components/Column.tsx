@@ -25,7 +25,7 @@ declare interface IColumnProps {
     readonly setColumnHeight: (columnId: number, height: number) => void;
     readonly changeColumnTitle: (columnId: number, newTitle: string) => void;
     readonly setHighlightedColumnId: (id: number) => void;
-    readonly moveCard: (cardId: number, newCard: ICard, oldColumnId: number) => void;
+    readonly moveCard: (newCard: ICard, oldCard: ICard) => void;
     readonly moveColumn: (columnId: number, newColumn: IColumn, oldBoardIndex: number) => void;
     readonly getColumnsAndCards: () => Promise<void>;
     readonly setIsLoading: (x: boolean) => void;
@@ -65,7 +65,7 @@ export function Column(props: IColumnProps) {
         }
     }, [columnIdAsString, props.cards]);
 
-    const sortedCards = props.cards.sort((x, y) => x.column_id > y.column_id ? 1 : -1);
+    const sortedCards = props.cards.sort((x, y) => x.columnIndex > y.columnIndex ? 1 : -1);
 
     const [, drag, preview] = useDrag({
         item: {
@@ -112,11 +112,11 @@ export function Column(props: IColumnProps) {
                 props.moveColumn(col.id, newColumn, col.boardIndex);
             }
 
-            if (item.type === 'card') {
-                const card = (item as IDraggableCard).card;
-                let newCard = { ...card }
+            if (item.type === 'card' && props.cards.length === 0) {
+                const oldCard = (item as IDraggableCard).card;
+                let newCard = { ...oldCard }
                 newCard = { ...newCard, column_id: props.column.id, columnIndex: 0 };
-                props.moveCard(card.id, newCard, card.column_id);
+                props.moveCard(newCard, oldCard);
             }
         },
         collect: monitor => {
@@ -226,7 +226,7 @@ export function Column(props: IColumnProps) {
                                     setDragCardId={(cardId: number) => props.setDragCardId(cardId)}
                                     setCardHeight={(cardId: number, height: number) => props.setCardHeight(cardId, height)}
                                     setHighlightedCardId={(id) => setHighlightedCardId(id)}
-                                    moveCard={(oldCardId: number, newCard: ICard, oldColumnId: number) => props.moveCard(oldCardId, newCard, oldColumnId)} />
+                                    moveCard={(newCard: ICard, oldCard: ICard) => props.moveCard(newCard, oldCard)} />
                             )}
                             {displayCard === true &&
                                 <div className='card add-card'>
