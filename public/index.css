@@ -221,8 +221,8 @@ body {
 }
 
 .custom-drag-layer {
-    transform: rotate(7deg);
-    -webkit-transform: rotate(7deg);
+    transform: rotate(4deg);
+    -webkit-transform: rotate(4deg);
 }
 
 .custom-drag-card {
