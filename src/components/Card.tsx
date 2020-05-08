@@ -34,7 +34,7 @@ export function Card(props: ICardProps) {
         collect: monitor => {
             if (monitor.isDragging()) {
                 if (cardRef.current != null) {
-                    const cardHeight = cardRef.current.clientHeight;
+                    const cardHeight = cardRef.current.clientHeight + 2;
                     props.setCardHeight(props.card.id, cardHeight);
                 }
                 setIsDragging(true);

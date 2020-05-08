@@ -128,7 +128,7 @@ export function Column(props: IColumnProps) {
                 setDisplayFirstPlaceholderCard(false)
             }
         },
-        hover: (item, monitor) => {
+        hover: (item: IDraggableColumn | IDraggableCard, monitor) => {
             if (item.type === 'column') {
                 if (monitor.isOver()) props.setHighlightedColumnId(props.column.id);
 
@@ -145,6 +145,11 @@ export function Column(props: IColumnProps) {
 
             if (item.type === 'card' && props.cards.length === 0) {
                 setDisplayFirstPlaceholderCard(true);
+                props.setHighlightedCardId(0);
+            }
+
+            if (item.type === 'card' && props.cards.length === 1) {
+                props.setHighlightedCardId((item as IDraggableCard).card.id);
             }
         }
     });
