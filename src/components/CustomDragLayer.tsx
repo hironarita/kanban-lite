@@ -3,6 +3,7 @@ import { useDragLayer, XYCoord } from 'react-dnd';
 import TextareaAutosize from 'react-textarea-autosize';
 import { IDraggableColumn } from './Column';
 import { IDraggableCard } from './Card';
+import TrashIcon from '../images/trash.svg';
 
 export const CustomDragLayer = () => {
     const getItemStyles = (initialOffset: XYCoord | null, currentOffset: XYCoord | null) => {
@@ -42,12 +43,13 @@ export const CustomDragLayer = () => {
         switch (itemType) {
             case 'column':
                 return <div className='column custom-drag-layer'>
-                    <div className='mb-2'>
+                    <div className='d-flex justify-content-between align-items-center mb-2'>
                         <TextareaAutosize
                             type='text'
                             className='column-title'
                             defaultValue={(item as IDraggableColumn).column.title}
                             placeholder='Enter list title...' />
+                        <img src={TrashIcon} alt='delete icon' />
                     </div>
                     {(item as IDraggableColumn).cards.map(x => (
                         <div key={x.id} className='card trello-card'>

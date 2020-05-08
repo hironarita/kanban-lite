@@ -4,6 +4,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend'
 import { Card, IDraggableCard } from './Card';
 import { post } from '../utilities/Axios';
+import TrashIcon from '../images/trash.svg';
 
 declare interface IColumnProps {
     readonly column: IColumn;
@@ -202,7 +203,7 @@ export function Column(props: IColumnProps) {
                 {isDragging === false &&
                     <div>
                         <div id={columnIdAsString} ref={columnRef} className='column'>
-                            <div className='mb-2'>
+                            <div className='d-flex justify-content-between align-items-center mb-2'>
                                 <TextareaAutosize
                                     type='text'
                                     inputRef={textarea}
@@ -212,6 +213,7 @@ export function Column(props: IColumnProps) {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)}
                                     onBlur={() => props.changeColumnTitle(props.column.id, columnTitle)} />
+                                <img src={TrashIcon} alt='delete icon' />
                             </div>
                             {sortedCards.length <= 1 && displayFirstPlaceholderCard === true &&
                                 <div style={{ height: props.dragCardHeight }} className='card trello-card placeholder-card'></div>
