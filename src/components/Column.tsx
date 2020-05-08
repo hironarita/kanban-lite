@@ -148,7 +148,7 @@ export function Column(props: IColumnProps) {
                 props.setHighlightedCardId(0);
             }
 
-            if (item.type === 'card' && props.cards.length === 1) {
+            if (item.type === 'card' && props.cards.length === 1 && (item as IDraggableCard).card.column_id === props.column.id) {
                 props.setHighlightedCardId((item as IDraggableCard).card.id);
             }
         }
