@@ -139,7 +139,7 @@ export function Column(props: IColumnProps) {
                 }
             }
 
-            if (item.type === 'card') {
+            if (item.type === 'card' && props.cards.length === 0) {
                 setDisplayFirstPlaceholderCard(true);
             }
         }

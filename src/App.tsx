@@ -83,7 +83,7 @@ function App(props: IAppProps) {
 		let resetCards: ICard[] = [];
 		if (newCard.column_id !== oldCard.column_id) {
 			resetCards = allCardsExceptOldCard
-				.filter(x => x.column_id === oldCard.column_id)
+				.filter(x => x.column_id === oldCard.column_id && x.id !== oldCard.id)
 				.map((x, i) => ({ ...x, columnIndex: i }));
 		}
 
