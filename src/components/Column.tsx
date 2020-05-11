@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend'
+import Swal from 'sweetalert2';
 import { Card, IDraggableCard } from './Card';
 import { post } from '../utilities/Axios';
 import TrashIcon from '../images/trash.svg';
@@ -199,6 +200,34 @@ export function Column(props: IColumnProps) {
         setCardTitle(title);
     };
 
+    const removeColumn = async () => {
+        props.setIsLoading(true);
+        Swal.fire({
+            title: 'Are you sure you want to delete this list?',
+            text: "It will also delete all corresponding cards.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async result => {
+            if (result.value) {
+                try {
+                    await post('/columns/delete/' + props.column.id);
+                    await props.getColumnsAndCards();
+                    Swal.fire(
+                        'Deleted!',
+                        'Your list has been deleted.',
+                        'success'
+                    );
+                } finally {
+                    props.setIsLoading(false);
+                }
+            }
+        });
+
+    };
+
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
 
@@ -221,7 +250,10 @@ export function Column(props: IColumnProps) {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)}
                                     onBlur={() => props.changeColumnTitle(props.column.id, columnTitle)} />
-                                <img src={TrashIcon} alt='delete icon' />
+                                <img
+                                    src={TrashIcon}
+                                    alt='delete icon'
+                                    onClick={() => removeColumn()} />
                             </div>
                             {sortedCards.length <= 1 && displayFirstPlaceholderCard === true &&
                                 <div style={{ height: props.dragCardHeight }} className='card trello-card placeholder-card'></div>
