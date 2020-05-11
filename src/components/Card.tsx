@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
+import { useHistory } from 'react-router-dom';
+import { Path } from '../utilities/Enums';
 
 declare interface ICardProps {
     readonly card: ICard;
@@ -26,6 +28,7 @@ export interface IDraggableCard {
 export function Card(props: ICardProps) {
     const ref = useRef(null);
     const cardRef = useRef<any>(null);
+    const history = useHistory();
 
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableCardAbove, setDisplayDroppableCardAbove] = useState(false);
@@ -64,7 +67,9 @@ export function Card(props: ICardProps) {
         drop: (item: IDraggableCard) => {
             const oldCard = item.card;
             const columnIndex = displayDroppableCardAbove === true
-                ? props.card.columnIndex
+                ? props.card.columnIndex === 0
+                    ? 0
+                    : props.card.columnIndex - 1
                 : props.card.columnIndex + 1;
             let newCard = { ...oldCard };
             newCard = { ...oldCard, column_id: props.card.column_id, columnIndex };
@@ -98,7 +103,8 @@ export function Card(props: ICardProps) {
                     ref={cardRef}
                     className={'card trello-card ' + (isMouseHoveringOver === true && props.isDragInProgress === false ? 'active-card' : '')}
                     onMouseOver={() => setIsMouseHoveringOver(true)}
-                    onMouseLeave={() => setIsMouseHoveringOver(false)}>
+                    onMouseLeave={() => setIsMouseHoveringOver(false)}
+                    onClick={() => history.push(Path.Card.replace(':id', props.card.id.toString()))}>
                     <span>{isDragging === false && props.card.title}</span>
                 </div>
             }

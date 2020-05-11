@@ -110,7 +110,9 @@ export function Column(props: IColumnProps) {
             if (item.type === 'column') {
                 const col = (item as IDraggableColumn).column;
                 const boardIndex = displayDroppableLeftColumn === true
-                    ? props.column.boardIndex
+                    ? props.column.boardIndex === 0
+                        ? 0
+                        : props.column.boardIndex - 1
                     : props.column.boardIndex + 1;
                 let newColumn = { ...col };
                 newColumn = { ...newColumn, boardIndex };
@@ -211,8 +213,8 @@ export function Column(props: IColumnProps) {
             confirmButtonText: 'Yes, delete it!'
         });
         if (response.value) {
+            props.setIsLoading(true);
             try {
-                props.setIsLoading(true);
                 await post('/columns/delete/' + props.column.id);
                 await props.getColumnsAndCards();
                 Swal.fire(

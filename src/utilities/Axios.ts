@@ -15,7 +15,7 @@ instance.interceptors.response.use(response => response, error => {
                 icon: 'error'
             });
         }
-        if (errRes.config.url === '/account/login' && errRes.status === 400) {
+        if (errRes.config.url === '/account/login' && [400, 401].includes(errRes.status)) {
             Swal.fire({
                 title: 'Error!',
                 text: 'Invalid username/password',
