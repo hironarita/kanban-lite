@@ -233,6 +233,8 @@ export function Column(props: IColumnProps) {
                                     highlightedCardId={props.highlightedCardId}
                                     dragCardHeight={props.dragCardHeight}
                                     dragCardId={props.dragCardId}
+                                    isDragInProgress={props.isDragInProgress}
+                                    setIsDragInProgress={(x: boolean) => props.setIsDragInProgress(x)}
                                     setDragCardId={(cardId: number) => props.setDragCardId(cardId)}
                                     setCardHeight={(cardId: number, height: number) => props.setCardHeight(cardId, height)}
                                     setHighlightedCardId={(id) => props.setHighlightedCardId(id)}

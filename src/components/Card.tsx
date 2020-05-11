@@ -6,6 +6,7 @@ declare interface ICardProps {
     readonly card: ICard;
     readonly dragCardHeight: number;
     readonly dragCardId: number;
+    readonly isDragInProgress: boolean;
 
     /** determines which card is being hovered over */
     readonly highlightedCardId: number;
@@ -14,6 +15,7 @@ declare interface ICardProps {
     readonly setCardHeight: (cardId: number, height: number) => void;
     readonly moveCard: (newCard: ICard, oldCard: ICard) => void;
     readonly setHighlightedCardId: (cardId: number) => void;
+    readonly setIsDragInProgress: (x: boolean) => void;
 }
 
 export interface IDraggableCard {
@@ -28,6 +30,7 @@ export function Card(props: ICardProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableCardAbove, setDisplayDroppableCardAbove] = useState(false);
     const [displayDroppableCardBelow, setDisplayDroppableCardBelow] = useState(false);
+    const [isMouseHoveringOver, setIsMouseHoveringOver] = useState(false);
 
     const [, drag, preview] = useDrag({
         item: { type: 'card', card: props.card },
@@ -45,9 +48,11 @@ export function Card(props: ICardProps) {
             }
         },
         begin: () => {
+            props.setIsDragInProgress(true);
             props.setDragCardId(props.card.id);
             props.setHighlightedCardId(props.card.id);
-        }
+        },
+        end: () => props.setIsDragInProgress(false)
     });
 
     useEffect(() => {
@@ -78,7 +83,7 @@ export function Card(props: ICardProps) {
                 setDisplayDroppableCardAbove(false);
             }
         }
-    })
+    });
 
     // allows for the Card component to be both dragged and dropped on
     drag(drop(ref));
@@ -89,7 +94,11 @@ export function Card(props: ICardProps) {
                 <div style={{ height: props.dragCardHeight }} className='card trello-card droppable-card'></div>
             }
             {isDragging === false &&
-                <div ref={cardRef} className='card trello-card'>
+                <div
+                    ref={cardRef}
+                    className={'card trello-card ' + (isMouseHoveringOver === true && props.isDragInProgress === false ? 'active-card' : '')}
+                    onMouseOver={() => setIsMouseHoveringOver(true)}
+                    onMouseLeave={() => setIsMouseHoveringOver(false)}>
                     <span>{isDragging === false && props.card.title}</span>
                 </div>
             }

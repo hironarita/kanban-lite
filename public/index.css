@@ -83,6 +83,10 @@ body {
     cursor: pointer;
 }
 
+.active-card {
+    background-color: #f4f5f7;
+}
+
 .add-card {
     padding: 8px;
     margin-bottom: 10px;
