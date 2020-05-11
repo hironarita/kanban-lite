@@ -74,7 +74,7 @@ export function Card(props: ICardProps) {
                 ? props.card.columnIndex
                 : props.card.columnIndex + 1;
             let newCard = { ...oldCard };
-            newCard = { ...oldCard, column_id: props.card.column_id, columnIndex };
+            newCard = { ...oldCard, column_id: props.card.column_id, columnIndex, isNew: true };
             props.moveCard(newCard, oldCard);
         },
         hover: (_item, monitor) => {

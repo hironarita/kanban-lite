@@ -115,14 +115,10 @@ export function Column(props: IColumnProps) {
             if (item.type === 'column') {
                 const col = (item as IDraggableColumn).column;
                 const boardIndex = displayDroppableLeftColumn === true
-                    ? props.columnCount > 2
-                        ? props.column.boardIndex
-                        : props.column.boardIndex === 0
-                            ? 0
-                            : props.column.boardIndex - 1
+                    ? props.column.boardIndex
                     : props.column.boardIndex + 1;
                 let newColumn = { ...col };
-                newColumn = { ...newColumn, boardIndex };
+                newColumn = { ...newColumn, boardIndex, isNew: true };
                 props.moveColumn(col.id, newColumn, col.boardIndex);
             }
 
@@ -130,7 +126,7 @@ export function Column(props: IColumnProps) {
                 const oldCard = (item as IDraggableCard).card;
                 setTimeout(() => props.setHoverCardId(oldCard.id), 50);
                 let newCard = { ...oldCard }
-                newCard = { ...newCard, column_id: props.column.id, columnIndex: 0 };
+                newCard = { ...newCard, column_id: props.column.id, columnIndex: 0, isNew: true };
                 props.moveCard(newCard, oldCard);
             }
         },

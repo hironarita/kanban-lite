@@ -5,6 +5,9 @@ declare interface IColumn {
     readonly title: string;
     readonly updatedAt: string;
     readonly user_id: number;
+
+    /** not returned from server - manually addded on client side when moving columns */
+    readonly isNew?: boolean;
 }
 
 declare interface ICard {
@@ -14,4 +17,7 @@ declare interface ICard {
     readonly id: number;
     readonly title: string;
     readonly updatedAt: string;
+
+    /** not returned from server - manually addded on client side when moving cards */
+    readonly isNew?: boolean;
 }

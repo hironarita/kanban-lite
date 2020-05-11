@@ -76,10 +76,10 @@ function App(props: IAppProps) {
 			.sort((x, y) => x.columnIndex > y.columnIndex ? 1 : -1);
 		newColumnCards.splice(newCard.columnIndex, 0, newCard);
 		const newCards = newColumnCards
-			.filter(x => !(x.id === oldCard.id && x.columnIndex === oldCard.columnIndex && x.column_id === oldCard.column_id))
+			.filter(x => !(x.id === oldCard.id && x.columnIndex === oldCard.columnIndex && x.column_id === oldCard.column_id && !x.isNew))
 			.map((x, i) => ({ ...x, columnIndex: i }));
 
-		const allCardsExceptOldCard = clonedCards.filter(x => !(x.id === oldCard.id && x.columnIndex === oldCard.columnIndex && x.column_id === oldCard.column_id));
+		const allCardsExceptOldCard = clonedCards.filter(x => !(x.id === oldCard.id && x.columnIndex === oldCard.columnIndex && x.column_id === oldCard.column_id && !x.isNew));
 
 		// reset column indexes on cards in the old column
 		let resetCards: ICard[] = [];
@@ -141,7 +141,7 @@ function App(props: IAppProps) {
 			.sort((x, y) => x.boardIndex > y.boardIndex ? 1 : -1);
 		clonedColumns.splice(newColumn.boardIndex, 0, newColumn);
 		const newColumns = clonedColumns
-			.filter(x => !(x.id === oldColumnId && x.boardIndex === oldBoardIndex))
+			.filter(x => !(x.id === oldColumnId && x.boardIndex === oldBoardIndex && !x.isNew))
 			.map((x, i) => ({ ...x, boardIndex: i }));
 		setColumns(newColumns);
 		let data = {};
