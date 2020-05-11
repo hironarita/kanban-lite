@@ -227,7 +227,7 @@ function App(props: IAppProps) {
 									onClick={() => addColumn()}
 									className='btn add-column-button add-logout-btn'
 									disabled={isLoading === true}>
-									+ Add another list
+									+ Add <span>{columns.length === 0 ? 'a' : 'another'}</span> list
 								</button>
 							</div>
 						</div>

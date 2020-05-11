@@ -201,8 +201,7 @@ export function Column(props: IColumnProps) {
     };
 
     const removeColumn = async () => {
-        props.setIsLoading(true);
-        Swal.fire({
+        const response = await Swal.fire({
             title: 'Are you sure you want to delete this list?',
             text: "It will also delete all corresponding cards.",
             icon: 'warning',
@@ -210,22 +209,21 @@ export function Column(props: IColumnProps) {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
-        }).then(async result => {
-            if (result.value) {
-                try {
-                    await post('/columns/delete/' + props.column.id);
-                    await props.getColumnsAndCards();
-                    Swal.fire(
-                        'Deleted!',
-                        'Your list has been deleted.',
-                        'success'
-                    );
-                } finally {
-                    props.setIsLoading(false);
-                }
-            }
         });
-
+        if (response.value) {
+            try {
+                props.setIsLoading(true);
+                await post('/columns/delete/' + props.column.id);
+                await props.getColumnsAndCards();
+                Swal.fire(
+                    'Deleted!',
+                    'Your list has been deleted.',
+                    'success'
+                );
+            } finally {
+                props.setIsLoading(false);
+            }
+        }
     };
 
     // allows for the Column component to be both dragged and dropped on
@@ -290,7 +288,7 @@ export function Column(props: IColumnProps) {
                                 className='btn add-card-button mt-2 add-logout-btn'
                                 onClick={() => { if (displayCard === false) setDisplayCard(true) }}
                                 disabled={props.isLoading === true}>
-                                + Add a card
+                                + Add <span>{props.cards.length === 0 ? 'a' : 'another'}</span> card
                             </button>
                         </div>
                         {props.dragColumnId !== props.column.id && props.isDragInProgress === true &&
