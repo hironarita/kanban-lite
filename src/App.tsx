@@ -3,7 +3,7 @@ import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Column } from './components/Column';
-import { ModalManager } from './components/ModalManager';
+import { CardDetails } from './components/CardDetails';
 import { Path } from './utilities/Enums';
 import { LoginSignup } from './components/LoginSignup';
 import { get, post } from './utilities/Axios';
@@ -236,7 +236,7 @@ function App(props: IAppProps) {
 				: <LoginSignup logIn={() => setIsLoggedIn(true)} />
 			}
 			<Route path={Path.Card}>
-				<ModalManager />
+				<CardDetails />
 			</Route>
 		</Router>
 	);

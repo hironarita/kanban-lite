@@ -44,7 +44,7 @@ export interface IDraggableColumn {
 }
 
 export function Column(props: IColumnProps) {
-    let textarea = useRef<any>(null);
+    const textarea = useRef<any>(null);
     const ref = useRef(null);
     const columnRef = useRef<any>(null);
 
@@ -177,10 +177,6 @@ export function Column(props: IColumnProps) {
         setDisplayCard(false);
     };
 
-    const handleOnChange = (title: string) => {
-        setColumnTitle(title);
-    };
-
     const handleKeyDown = (key: string) => {
         if (key === 'Enter') {
             textarea.current.blur();
@@ -192,14 +188,6 @@ export function Column(props: IColumnProps) {
             e.preventDefault();
             addCard(cardTitle);
         }
-    };
-
-    const handleOnBlurForCard = () => {
-        addCard(cardTitle);
-    };
-
-    const handleOnChangeForCard = (title: string) => {
-        setCardTitle(title);
     };
 
     const removeColumn = async () => {
@@ -247,7 +235,7 @@ export function Column(props: IColumnProps) {
                                     className='column-title'
                                     value={columnTitle}
                                     placeholder='Enter list title...'
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChange(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setColumnTitle(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)}
                                     onBlur={() => props.changeColumnTitle(props.column.id, columnTitle)} />
                                 <img
@@ -280,9 +268,9 @@ export function Column(props: IColumnProps) {
                                         className='card-input'
                                         value={cardTitle}
                                         placeholder='Enter a title for this card...'
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOnChangeForCard(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardTitle(e.target.value)}
                                         onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDownForCard(e)}
-                                        onBlur={() => handleOnBlurForCard()} />
+                                        onBlur={() => addCard(cardTitle)} />
                                 </div>
                             }
                             <button

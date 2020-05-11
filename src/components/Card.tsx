@@ -52,6 +52,7 @@ export function Card(props: ICardProps) {
         },
         begin: () => {
             props.setIsDragInProgress(true);
+            setIsMouseHoveringOver(false);
             props.setDragCardId(props.card.id);
             props.setHighlightedCardId(props.card.id);
         },
@@ -102,7 +103,7 @@ export function Card(props: ICardProps) {
                 <div
                     ref={cardRef}
                     className={'card trello-card ' + (isMouseHoveringOver === true && props.isDragInProgress === false ? 'active-card' : '')}
-                    onMouseOver={() => setIsMouseHoveringOver(true)}
+                    onMouseEnter={() => setIsMouseHoveringOver(true)}
                     onMouseLeave={() => setIsMouseHoveringOver(false)}
                     onClick={() => history.push(Path.Card.replace(':id', props.card.id.toString()))}>
                     <span>{isDragging === false && props.card.title}</span>
