@@ -24,6 +24,7 @@ function App(props: IAppProps) {
 	const [isDragInProgress, setIsDragInProgress] = useState(false);
 	const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
 	const [isLoading, setIsLoading] = useState(false);
+	const [hoverCardId, setHoverCardId] = useState(0);
 
 	const getColumnsCardsAndSetState = async () => {
 		const columns = await get<IColumn[]>('/columns');
@@ -206,6 +207,9 @@ function App(props: IAppProps) {
 										dragCardHeight={dragCardHeight}
 										isDragInProgress={isDragInProgress}
 										cards={cards.filter(y => y.column_id === x.id)}
+										hoverCardId={hoverCardId}
+										columnCount={columns.length}
+										setHoverCardId={(cardId: number) => setHoverCardId(cardId)}
 										setIsDragInProgress={(x: boolean) => setIsDragInProgress(x)}
 										setCardHeight={(cardId: number, height: number) => setCardHeight(cardId, height)}
 										setDragCardId={(cardId: number) => setDragCardId(cardId)}

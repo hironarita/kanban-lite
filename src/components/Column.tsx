@@ -16,6 +16,9 @@ declare interface IColumnProps {
     /** determines which card is being hovered over */
     readonly highlightedCardId: number;
 
+    /** determines which card is being hovered over while NOT dragging */
+    readonly hoverCardId: number;
+
     readonly dragColumnId: number;
     readonly dragColumnHeight: number;
     readonly dragCardId: number;
@@ -23,6 +26,8 @@ declare interface IColumnProps {
     readonly isDragInProgress: boolean;
     readonly cards: ICard[];
     readonly isLoading: boolean;
+    readonly columnCount: number;
+    readonly setHoverCardId: (cardId: number) => void;
     readonly setIsDragInProgress: (x: boolean) => void;
     readonly setDragCardId: (cardId: number) => void;
     readonly setCardHeight: (cardId: number, height: number) => void;
@@ -110,9 +115,11 @@ export function Column(props: IColumnProps) {
             if (item.type === 'column') {
                 const col = (item as IDraggableColumn).column;
                 const boardIndex = displayDroppableLeftColumn === true
-                    ? props.column.boardIndex === 0
-                        ? 0
-                        : props.column.boardIndex - 1
+                    ? props.columnCount > 2
+                        ? props.column.boardIndex
+                        : props.column.boardIndex === 0
+                            ? 0
+                            : props.column.boardIndex - 1
                     : props.column.boardIndex + 1;
                 let newColumn = { ...col };
                 newColumn = { ...newColumn, boardIndex };
@@ -121,6 +128,7 @@ export function Column(props: IColumnProps) {
 
             if (item.type === 'card' && props.cards.length === 0) {
                 const oldCard = (item as IDraggableCard).card;
+                setTimeout(() => props.setHoverCardId(oldCard.id), 50);
                 let newCard = { ...oldCard }
                 newCard = { ...newCard, column_id: props.column.id, columnIndex: 0 };
                 props.moveCard(newCard, oldCard);
@@ -254,6 +262,8 @@ export function Column(props: IColumnProps) {
                                     dragCardHeight={props.dragCardHeight}
                                     dragCardId={props.dragCardId}
                                     isDragInProgress={props.isDragInProgress}
+                                    hoverCardId={props.hoverCardId}
+                                    setHoverCardId={(cardId: number) => props.setHoverCardId(cardId)}
                                     setIsDragInProgress={(x: boolean) => props.setIsDragInProgress(x)}
                                     setDragCardId={(cardId: number) => props.setDragCardId(cardId)}
                                     setCardHeight={(cardId: number, height: number) => props.setCardHeight(cardId, height)}

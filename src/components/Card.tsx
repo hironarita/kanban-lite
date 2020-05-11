@@ -10,9 +10,13 @@ declare interface ICardProps {
     readonly dragCardId: number;
     readonly isDragInProgress: boolean;
 
-    /** determines which card is being hovered over */
+    /** determines which card is being hovered over while NOT dragging */
+    readonly hoverCardId: number;
+
+    /** determines which card is being hovered over while dragging */
     readonly highlightedCardId: number;
 
+    readonly setHoverCardId: (cardId: number) => void;
     readonly setDragCardId: (cardId: number) => void;
     readonly setCardHeight: (cardId: number, height: number) => void;
     readonly moveCard: (newCard: ICard, oldCard: ICard) => void;
@@ -33,7 +37,6 @@ export function Card(props: ICardProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [displayDroppableCardAbove, setDisplayDroppableCardAbove] = useState(false);
     const [displayDroppableCardBelow, setDisplayDroppableCardBelow] = useState(false);
-    const [isMouseHoveringOver, setIsMouseHoveringOver] = useState(false);
 
     const [, drag, preview] = useDrag({
         item: { type: 'card', card: props.card },
@@ -52,7 +55,6 @@ export function Card(props: ICardProps) {
         },
         begin: () => {
             props.setIsDragInProgress(true);
-            setIsMouseHoveringOver(false);
             props.setDragCardId(props.card.id);
             props.setHighlightedCardId(props.card.id);
         },
@@ -66,11 +68,10 @@ export function Card(props: ICardProps) {
     const [, drop] = useDrop({
         accept: 'card',
         drop: (item: IDraggableCard) => {
+            setTimeout(() => props.setHoverCardId(item.card.id), 50);
             const oldCard = item.card;
             const columnIndex = displayDroppableCardAbove === true
-                ? props.card.columnIndex === 0
-                    ? 0
-                    : props.card.columnIndex - 1
+                ? props.card.columnIndex
                 : props.card.columnIndex + 1;
             let newCard = { ...oldCard };
             newCard = { ...oldCard, column_id: props.card.column_id, columnIndex };
@@ -102,9 +103,9 @@ export function Card(props: ICardProps) {
             {isDragging === false &&
                 <div
                     ref={cardRef}
-                    className={'card trello-card ' + (isMouseHoveringOver === true && props.isDragInProgress === false ? 'active-card' : '')}
-                    onMouseEnter={() => setIsMouseHoveringOver(true)}
-                    onMouseLeave={() => setIsMouseHoveringOver(false)}
+                    className={'card trello-card ' + (props.hoverCardId === props.card.id ? 'active-card' : '')}
+                    onMouseOver={() => { if (props.isDragInProgress === false) props.setHoverCardId(props.card.id) }}
+                    onMouseLeave={() => props.setHoverCardId(0)}
                     onClick={() => history.push(Path.Card.replace(':id', props.card.id.toString()))}>
                     <span>{isDragging === false && props.card.title}</span>
                 </div>
