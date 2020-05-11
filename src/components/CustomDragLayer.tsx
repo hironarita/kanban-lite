@@ -25,7 +25,7 @@ export const CustomDragLayer = () => {
             transform,
             WebkitTransform: transform
         };
-    }
+    };
 
     const {
         initialOffset,
@@ -59,7 +59,7 @@ export const CustomDragLayer = () => {
                     <button
                         type='button'
                         className='btn add-card-button mt-2'>
-                        + Add a card
+                        + Add <span>{(item as IDraggableColumn).cards.length === 0 ? 'a' : 'another'}</span> card
                     </button>
                 </div>;
             case 'card':
