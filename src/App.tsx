@@ -240,7 +240,10 @@ function App(props: IAppProps) {
 				: <LoginSignup logIn={() => setIsLoggedIn(true)} />
 			}
 			<Route path={Path.Card}>
-				<CardDetails />
+				<CardDetails
+					isLoading={isLoading}
+					setIsLoading={(x: boolean) => setIsLoading(x)}
+					refetchCards={() => getCardsAndSetState()} />
 			</Route>
 		</Router>
 	);

@@ -16,6 +16,7 @@ declare interface ICard {
     readonly createdAt: string;
     readonly id: number;
     readonly title: string;
+    readonly description: string;
     readonly updatedAt: string;
 
     /** not returned from server - manually addded on client side when moving cards */

@@ -245,3 +245,23 @@ body {
     margin-left: 13px;
     font-family: 'Montserrat Medium';
 }
+
+.card-details-title {
+    margin-left: 8px;
+}
+
+.description-placeholder {
+    margin-left: 33px;
+    font-family: 'Montserrat Medium';
+    font-size: 12px;
+    padding: 10px;
+    background-color: rgba(9, 30, 66, .05);
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    height: 60px;
+}
+
+.description-placeholder:hover {
+    background-color: rgba(9, 30, 66, .1);
+}
