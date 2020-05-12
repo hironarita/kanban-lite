@@ -236,3 +236,12 @@ body {
 .add-logout-btn:disabled {
     opacity: 1;
 }
+
+.modal-background {
+    background-color: #f3ffbd;
+}
+
+.card-description {
+    margin-left: 13px;
+    font-family: 'Montserrat Medium';
+}
