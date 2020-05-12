@@ -7,6 +7,7 @@ import { get } from '../utilities/Axios';
 import TitleIcon from '../images/cardTitle.svg';
 import DescriptionIcon from '../images/cardDescription.svg';
 import { post } from '../utilities/Axios';
+import ActionsIcon from '../images/actions.svg';
 
 declare interface ICardDetailsProps {
     readonly isLoading: boolean;
@@ -41,6 +42,7 @@ export function CardDetails(props: ICardDetailsProps) {
     };
 
     const handleOnBlur = async () => {
+        if (title.length === 0) return setTitle(card!.title);
         const data = { title, description };
         props.setIsLoading(true);
         try {
@@ -75,6 +77,11 @@ export function CardDetails(props: ICardDetailsProps) {
                         <span>Add a more detailed description...</span>
                     </div>
                 }
+                <div className='d-flex align-items-center mt-3'>
+                    <img src={ActionsIcon} alt='actions icon' />
+                    <span className='card-description'>Actions</span>
+                </div>
+                <button className='btn btn-danger delete-card-btn'>Delete</button>
             </Modal.Body>
         </Modal>
     );

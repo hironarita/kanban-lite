@@ -265,3 +265,8 @@ body {
 .description-placeholder:hover {
     background-color: rgba(9, 30, 66, .1);
 }
+
+.delete-card-btn {
+    margin-left: 33px;
+    margin-top: 5px;
+}
