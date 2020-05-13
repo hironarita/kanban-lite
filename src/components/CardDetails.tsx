@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -26,18 +26,18 @@ export function CardDetails(props: ICardDetailsProps) {
     const [description, setDescription] = useState('');
     const [isEditingDescription, setIsEditingDescription] = useState(false);
 
-    const getCardAndSetState = async () => {
+    const getCardAndSetState = useCallback(async () => {
         const card = await get<ICard>('/cards/card/' + id);
         setCard(card);
         setTitle(card.title);
         setDescription(card.description);
-    };
+    }, [id]);
 
     useEffect(() => {
         (async () => {
             await getCardAndSetState();
         })();
-    }, [id]);
+    }, [getCardAndSetState]);
 
     useEffect(() => {
         if (isEditingDescription === true) descriptionTextarea.current.focus();
