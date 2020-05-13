@@ -125,7 +125,8 @@ export function CardDetails(props: ICardDetailsProps) {
                         value={description}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
                         onBlur={() => handleOnBlur()}
-                        minRows={5} />
+                        minRows={5}
+                        placeholder='Add a more detailed description...' />
                 }
                 <div className='d-flex align-items-center mt-3'>
                     <img src={ActionsIcon} alt='actions icon' />
