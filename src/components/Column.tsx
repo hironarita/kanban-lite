@@ -197,7 +197,7 @@ export function Column(props: IColumnProps) {
     const removeColumn = async () => {
         const response = await Swal.fire({
             title: 'Are you sure you want to delete this list?',
-            text: "It will also delete all corresponding cards.",
+            text: 'It will also delete all corresponding cards.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',

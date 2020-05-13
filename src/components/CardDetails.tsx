@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 import TextareaAutosize from 'react-textarea-autosize';
+import Swal from 'sweetalert2';
 import { Path } from '../utilities/Enums';
 import { get } from '../utilities/Axios';
 import TitleIcon from '../images/cardTitle.svg';
@@ -53,6 +54,28 @@ export function CardDetails(props: ICardDetailsProps) {
         }
     };
 
+    const removeCard = async () => {
+        const response = await Swal.fire({
+            title: 'Are you sure you want to delete this card?',
+            text: '',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        });
+        if (response.value) {
+            props.setIsLoading(true);
+            try {
+                await post('/cards/delete/' + card!.id);
+                await props.refetchCards();
+                history.replace(Path.Home);
+            } finally {
+                props.setIsLoading(false);
+            }
+        }
+    };
+
     return (
         <Modal show={true} onHide={handleClose}>
             <Modal.Header className='d-flex align-items-center modal-background' closeButton>
@@ -81,7 +104,12 @@ export function CardDetails(props: ICardDetailsProps) {
                     <img src={ActionsIcon} alt='actions icon' />
                     <span className='card-description'>Actions</span>
                 </div>
-                <button className='btn btn-danger delete-card-btn'>Delete</button>
+                <button
+                    className='btn btn-danger delete-card-btn'
+                    disabled={props.isLoading === true}
+                    onClick={() => removeCard()}>
+                    Delete
+                </button>
             </Modal.Body>
         </Modal>
     );
