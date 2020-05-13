@@ -17,6 +17,7 @@ declare interface ICardDetailsProps {
 }
 export function CardDetails(props: ICardDetailsProps) {
     const titleTextarea = useRef<any>(null);
+    const descriptionTextarea = useRef<any>(null);
     const { id } = useParams();
     const history = useHistory();
 
@@ -25,14 +26,22 @@ export function CardDetails(props: ICardDetailsProps) {
     const [description, setDescription] = useState('');
     const [isEditingDescription, setIsEditingDescription] = useState(false);
 
+    const getCardAndSetState = async () => {
+        const card = await get<ICard>('/cards/card/' + id);
+        setCard(card);
+        setTitle(card.title);
+        setDescription(card.description);
+    };
+
     useEffect(() => {
         (async () => {
-            const card = await get<ICard>('/cards/card/' + id);
-            setCard(card);
-            setTitle(card.title);
-            setDescription(card.description);
+            await getCardAndSetState();
         })();
     }, [id]);
+
+    useEffect(() => {
+        if (isEditingDescription === true) descriptionTextarea.current.focus();
+    }, [isEditingDescription]);
 
     const handleClose = () => history.push(Path.Home);
 
@@ -43,11 +52,18 @@ export function CardDetails(props: ICardDetailsProps) {
     };
 
     const handleOnBlur = async () => {
+        setIsEditingDescription(false);
         if (title.length === 0) return setTitle(card!.title);
-        const data = { title, description };
+        const data = {
+            title,
+            description: description.replace(/\s/g, '').length === 0
+                ? ''
+                : description 
+        };
         props.setIsLoading(true);
         try {
             await post('/cards/update/' + card!.id, data);
+            await getCardAndSetState();
             await props.refetchCards();
         } finally {
             props.setIsLoading(false);
@@ -94,9 +110,22 @@ export function CardDetails(props: ICardDetailsProps) {
                     <span className='card-description'>Description</span>
                 </div>
                 {description.length === 0 && isEditingDescription === false &&
-                    <div className='description-placeholder' onClick={() => setIsEditingDescription(true)}>
+                    <div className='no-description-placeholder' onClick={() => setIsEditingDescription(true)}>
                         <span>Add a more detailed description...</span>
                     </div>
+                }
+                {description.length > 0 && isEditingDescription === false &&
+                    <div className='description-placeholder' onClick={() => setIsEditingDescription(true)}>{description}</div>
+                }
+                {isEditingDescription === true &&
+                    <TextareaAutosize
+                        type='text'
+                        inputRef={descriptionTextarea}
+                        className='column-title card-details-textarea'
+                        value={description}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
+                        onBlur={() => handleOnBlur()}
+                        minRows={5} />
                 }
                 <div className='d-flex align-items-center mt-3'>
                     <img src={ActionsIcon} alt='actions icon' />

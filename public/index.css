@@ -222,21 +222,42 @@ body {
     margin-left: 33px;
     font-family: 'Montserrat Medium';
     font-size: 12px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 90%;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+}
+
+.no-description-placeholder {
+    margin-left: 33px;
+    font-family: 'Montserrat Medium';
+    font-size: 12px;
     padding: 10px;
     background-color: rgba(9, 30, 66, .05);
     border-radius: 4px;
     cursor: pointer;
     margin-top: 10px;
     height: 60px;
+    width: 90%;
 }
 
-.description-placeholder:hover {
+.no-description-placeholder:hover {
     background-color: rgba(9, 30, 66, .1);
 }
 
 .delete-card-btn {
     margin-left: 33px;
     margin-top: 10px;
+}
+
+.card-details-textarea {
+    margin-left: 33px;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 12px;
+    width: 90%;
+    overflow: hidden;
 }
 
 /* github corner */
