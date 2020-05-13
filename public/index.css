@@ -270,3 +270,8 @@ body {
     margin-left: 33px;
     margin-top: 10px;
 }
+
+/* overrides swal's default bg color */
+.swal-bg {
+    background-color: #f3ffbd !important;
+}

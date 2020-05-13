@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Swal from 'sweetalert2';
+import { swal } from '../utilities/Utilities';
 
 const instance = axios.create({
     baseURL: 'http://localhost:3000',
@@ -9,14 +9,14 @@ instance.interceptors.response.use(response => response, error => {
     const errRes = error.response;
     if (errRes) {
         if (errRes.config.url === '/account/register' && errRes.status === 400) {
-            Swal.fire({
+            swal.fire({
                 title: 'Error!',
                 text: 'Username already taken',
                 icon: 'error'
             });
         }
         if (errRes.config.url === '/account/login' && [400, 401].includes(errRes.status)) {
-            Swal.fire({
+            swal.fire({
                 title: 'Error!',
                 text: 'Invalid username/password',
                 icon: 'error'

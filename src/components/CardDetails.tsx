@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 import TextareaAutosize from 'react-textarea-autosize';
-import Swal from 'sweetalert2';
+import { swal } from '../utilities/Utilities';
 import { Path } from '../utilities/Enums';
 import { get } from '../utilities/Axios';
 import TitleIcon from '../images/cardTitle.svg';
@@ -55,13 +55,11 @@ export function CardDetails(props: ICardDetailsProps) {
     };
 
     const removeCard = async () => {
-        const response = await Swal.fire({
-            title: 'Are you sure you want to delete this card?',
-            text: '',
+        const response = await swal.fire({
+            title: '',
+            text: 'Are you sure you want to delete this card?',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
         });
         if (response.value) {

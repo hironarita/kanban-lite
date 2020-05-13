@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
+import { swal } from '../utilities/Utilities';
 import { post } from '../utilities/Axios';
 
 declare interface ILoginSignupProps {
@@ -34,7 +34,7 @@ export function LoginSignup(props: ILoginSignupProps) {
 
     const register = async () => {
         if (password.length < 6) {
-            return Swal.fire({
+            return swal.fire({
                 title: 'Error!',
                 text: 'Please make sure your password is at least 6 characters',
                 icon: 'error'
@@ -42,7 +42,7 @@ export function LoginSignup(props: ILoginSignupProps) {
         }
 
         if (password !== confirmPassword) {
-            return Swal.fire({
+            return swal.fire({
                 title: 'Error!',
                 text: 'Please make sure your passwords match',
                 icon: 'error'

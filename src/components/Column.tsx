@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend'
-import Swal from 'sweetalert2';
+import { swal } from '../utilities/Utilities';
 import { Card, IDraggableCard } from './Card';
 import { post } from '../utilities/Axios';
 import TrashIcon from '../images/trash.svg';
@@ -195,13 +195,11 @@ export function Column(props: IColumnProps) {
     };
 
     const removeColumn = async () => {
-        const response = await Swal.fire({
+        const response = await swal.fire({
             title: 'Are you sure you want to delete this list?',
             text: 'It will also delete all corresponding cards.',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
         });
         if (response.value) {
@@ -209,7 +207,7 @@ export function Column(props: IColumnProps) {
             try {
                 await post('/columns/delete/' + props.column.id);
                 await props.getColumnsAndCards();
-                Swal.fire(
+                swal.fire(
                     'Deleted!',
                     'Your list has been deleted.',
                     'success'
