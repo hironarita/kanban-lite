@@ -184,38 +184,6 @@ body {
     margin-top: 10px;
 }
 
-.github-corner:hover .octo-arm {
-    animation: octocat-wave 560ms ease-in-out
-}
-
-@keyframes octocat-wave {
-
-    0%,
-    100% {
-        transform: rotate(0)
-    }
-
-    20%,
-    60% {
-        transform: rotate(-25deg)
-    }
-
-    40%,
-    80% {
-        transform: rotate(10deg)
-    }
-}
-
-@media (max-width:500px) {
-    .github-corner:hover .octo-arm {
-        animation: none
-    }
-
-    .github-corner .octo-arm {
-        animation: octocat-wave 560ms ease-in-out
-    }
-}
-
 .custom-drag-layer-container {
     position: fixed;
     pointer-events: none;
@@ -271,7 +239,41 @@ body {
     margin-top: 10px;
 }
 
-/* overrides swal's default bg color */
+/* github corner */
+.github-corner:hover .octo-arm {
+    animation: octocat-wave 560ms ease-in-out
+}
+@keyframes octocat-wave {
+
+    0%,
+    100% {
+        transform: rotate(0)
+    }
+
+    20%,
+    60% {
+        transform: rotate(-25deg)
+    }
+
+    40%,
+    80% {
+        transform: rotate(10deg)
+    }
+}
+@media (max-width:500px) {
+    .github-corner:hover .octo-arm {
+        animation: none
+    }
+
+    .github-corner .octo-arm {
+        animation: octocat-wave 560ms ease-in-out
+    }
+}
+
+/* overrides swal's default styling */
 .swal-bg {
     background-color: #f3ffbd !important;
+}
+.swal-title {
+    font-size: 1.125em !important;
 }

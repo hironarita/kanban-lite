@@ -75,7 +75,7 @@ export function CardDetails(props: ICardDetailsProps) {
     };
 
     return (
-        <Modal show={true} onHide={handleClose}>
+        <Modal show={true} onHide={handleClose} animation={false}>
             <Modal.Header className='d-flex align-items-center modal-background' closeButton>
                 <img src={TitleIcon} alt='title icon' />
                 <TextareaAutosize
