@@ -2,7 +2,7 @@ import axios from 'axios';
 import { swal } from '../utilities/Utilities';
 
 const instance = axios.create({
-    baseURL: process.env.API_URL,
+    baseURL: 'https://kanban-lite-backend.herokuapp.com',
     withCredentials: true
 });
 instance.interceptors.response.use(response => response, error => {
