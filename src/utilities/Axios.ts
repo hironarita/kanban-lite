@@ -2,7 +2,7 @@ import axios from 'axios';
 import { swal } from '../utilities/Utilities';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.API_URL,
     withCredentials: true
 });
 instance.interceptors.response.use(response => response, error => {
