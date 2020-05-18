@@ -29,7 +29,7 @@ function App(props: IAppProps) {
 	const [hoverCardId, setHoverCardId] = useState(0);
 
 	const getColumnsCardsAndSetState = async () => {
-		const columns = await get<IColumn[]>('/columns?foo=' + Date.now());
+		const columns = await get<IColumn[]>('/columns');
 		setColumns(columns);
 		const colIds = columns
 			.map(x => x.id)
@@ -39,7 +39,7 @@ function App(props: IAppProps) {
 	};
 
 	const getColumnsAndSetState = async () => {
-		const columns = await get<IColumn[]>('/columns?foo=' + Date.now());
+		const columns = await get<IColumn[]>('/columns');
 		setColumns(columns);
 	};
 
