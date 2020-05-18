@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import Backend from 'react-dnd-html5-backend';
+import TouchBackend from 'react-dnd-touch-backend';
+import { isMobile, isTablet } from 'react-device-detect';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Column } from './components/Column';
 import { CardDetails } from './components/CardDetails';
@@ -183,7 +185,7 @@ function App(props: IAppProps) {
 		<Router>
 			{isLoggedIn === true
 				? <div>
-					<div className='d-flex mt-3'>
+					<div className='d-flex mt-3 align-items-center'>
 						<h1 className='logged-in-logo'>Kanban Lite</h1>
 						<button
 							className='btn log-out-btn add-logout-btn'
@@ -192,7 +194,7 @@ function App(props: IAppProps) {
 							Log Out
 						</button>
 					</div>
-					<DndProvider backend={Backend}>
+					<DndProvider backend={isMobile === true || isTablet === true ? TouchBackend : Backend}>
 						<CustomDragLayer />
 						<div className='trello-container'>
 							{sortedColumns.map(x =>

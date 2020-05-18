@@ -298,3 +298,9 @@ body {
 .swal-title {
     font-size: 1.125em !important;
 }
+
+@media all and (max-width: 425px) {
+    .logged-in-logo {
+        font-size: 24px;
+    }
+}
