@@ -3,10 +3,7 @@ import { swal } from '../utilities/Utilities';
 
 const instance = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
-    withCredentials: true,
-    headers: {
-        'Cache-Control': 'private, no-cache, no-store, must-revalidate'
-    }
+    withCredentials: true
 });
 instance.interceptors.response.use(response => response, error => {
     const errRes = error.response;
