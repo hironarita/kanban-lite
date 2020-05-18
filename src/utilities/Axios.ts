@@ -2,7 +2,7 @@ import axios from 'axios';
 import { swal } from '../utilities/Utilities';
 
 const instance = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
+    baseURL: 'https://kanban-lite-backend.hnarita.com',
     withCredentials: true
 });
 instance.interceptors.response.use(response => response, error => {
