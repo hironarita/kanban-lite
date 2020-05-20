@@ -3,7 +3,7 @@ import { useDragLayer, XYCoord } from 'react-dnd';
 import TextareaAutosize from 'react-textarea-autosize';
 import { IDraggableColumn } from './Column';
 import { IDraggableCard } from './Card';
-import TrashIcon from '../images/trash.svg';
+import ActionsIcon from '../images/actions.svg';
 
 export const CustomDragLayer = () => {
     const getItemStyles = (initialOffset: XYCoord | null, currentOffset: XYCoord | null) => {
@@ -49,7 +49,7 @@ export const CustomDragLayer = () => {
                             className='column-title'
                             defaultValue={(item as IDraggableColumn).column.title}
                             placeholder='Enter list title...' />
-                        <img src={TrashIcon} alt='delete icon' />
+                        <img src={ActionsIcon} alt='actions icon' />
                     </div>
                     {(item as IDraggableColumn).cards.map(x => (
                         <div key={x.id} className='card trello-card'>

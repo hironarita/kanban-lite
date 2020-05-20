@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend'
+import { Dropdown } from 'react-bootstrap';
 import { swal } from '../utilities/Utilities';
 import { Card, IDraggableCard } from './Card';
 import { post } from '../utilities/Axios';
-import TrashIcon from '../images/trash.svg';
+import ActionsIcon from '../images/actions.svg';
+import BackArrow from '../images/backArrow.svg';
 
 declare interface IColumnProps {
     readonly column: IColumn;
@@ -62,6 +64,7 @@ export function Column(props: IColumnProps) {
     const [columnIndex, setColumnIndex] = useState(props.cards.length);
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
     const [displayFirstPlaceholderCard, setDisplayFirstPlaceholderCard] = useState(false);
+    const [isMoveListMenuOpen, setIsMoveListMenuOpen] = useState(false);
 
     const columnIdAsString = props.column.id.toString();
 
@@ -218,6 +221,24 @@ export function Column(props: IColumnProps) {
         }
     };
 
+    const openMoveListMenu = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+        // stops the dropdown from closing
+        e.stopPropagation();
+
+        setIsMoveListMenuOpen(true);
+    }
+
+    const CustomToggle = React.forwardRef<any, any>(({ children, onClick }, toggleRef) => (
+        <img
+            src={ActionsIcon}
+            alt='actions icon'
+            ref={toggleRef as any}
+            onClick={(e) => {
+                e.preventDefault();
+                onClick(e);
+            }} />
+    ));
+
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
 
@@ -240,10 +261,20 @@ export function Column(props: IColumnProps) {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setColumnTitle(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)}
                                     onBlur={() => props.changeColumnTitle(props.column.id, columnTitle)} />
-                                <img
-                                    src={TrashIcon}
-                                    alt='delete icon'
-                                    onClick={() => removeColumn()} />
+                                <Dropdown>
+                                    <Dropdown.Toggle id="dropdown-basic" as={CustomToggle}>
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        {isMoveListMenuOpen === true && <img src={BackArrow} alt='back' className='back-arrow' />}
+                                        <Dropdown.Item>
+                                            <span onClick={e => openMoveListMenu(e)}>Move List...</span>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item>
+                                            <span onClick={e => removeColumn()}>Delete</span>
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </div>
                             {sortedCards.length <= 1 && displayFirstPlaceholderCard === true &&
                                 <div style={{ height: props.dragCardHeight }} className='card trello-card placeholder-card'></div>

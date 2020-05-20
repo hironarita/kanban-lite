@@ -260,6 +260,26 @@ body {
     overflow: hidden;
 }
 
+.back-arrow {
+    height: 24px;
+    width: 24px;
+    margin-left: 20px;
+}
+
+.dropdown-menu {
+    cursor: default;
+}
+
+.dropdown-item {
+    cursor:  pointer;
+}
+
+@media all and (max-width: 425px) {
+    .logged-in-logo {
+        font-size: 24px;
+    }
+}
+
 /* github corner */
 .github-corner:hover .octo-arm {
     animation: octocat-wave 560ms ease-in-out
@@ -297,10 +317,4 @@ body {
 }
 .swal-title {
     font-size: 1.125em !important;
-}
-
-@media all and (max-width: 425px) {
-    .logged-in-logo {
-        font-size: 24px;
-    }
 }
