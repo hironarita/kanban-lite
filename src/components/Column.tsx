@@ -64,6 +64,7 @@ export function Column(props: IColumnProps) {
     const [columnIndex, setColumnIndex] = useState(props.cards.length);
     const [invisibleColumnHeight, setInvisibleColumnHeight] = useState(0);
     const [displayFirstPlaceholderCard, setDisplayFirstPlaceholderCard] = useState(false);
+    const [isActionsDropdownOpen, setIsActionsDropdownOpen] = useState(false);
     const [isMoveListMenuOpen, setIsMoveListMenuOpen] = useState(false);
 
     const columnIdAsString = props.column.id.toString();
@@ -228,11 +229,11 @@ export function Column(props: IColumnProps) {
         setIsMoveListMenuOpen(true);
     }
 
-    const customToggle = React.forwardRef<any, any>(({ children, onClick }, toggleRef) => (
+    const actionsToggle = React.forwardRef<any, any>(({ children, onClick }, actionsToggleRef) => (
         <img
             src={ActionsIcon}
             alt='actions icon'
-            ref={toggleRef}
+            ref={actionsToggleRef}
             onClick={(e) => {
                 e.preventDefault();
                 onClick(e);
@@ -242,6 +243,40 @@ export function Column(props: IColumnProps) {
     const moveDropdownItem = () => <span className='dropdown-item' onClick={e => openMoveListMenu(e)}>Move List...</span>;
 
     const deleteDropdownItem = () => <span className='dropdown-item' onClick={e => removeColumn()}>Delete</span>;
+
+    const positionToggle = React.forwardRef<any, any>(({ children, onClick }, positionToggleRef) => (
+        <div
+            ref={positionToggleRef}
+            className='position-btn'
+            onClick={(e) => {
+                e.preventDefault();
+                onClick(e);
+            }}>
+                <div>
+                    <span>Position</span>
+                </div>
+                <div>
+                    <span>{props.column.boardIndex + 1}</span>
+                </div>
+        </div>
+    ));
+
+    const moveColumnFromDropdown = (index: number) => {
+        setIsActionsDropdownOpen(false);
+        let newColumn = { ...props.column };
+        newColumn = { ...newColumn, boardIndex: index === 0 ? 0 : index + 1, isNew: true };
+        props.moveColumn(props.column.id, newColumn, props.column.boardIndex);
+    };
+
+    const positionDropdownItem = (index: number) =>
+        <span className='dropdown-item position-dropdown-item' onClick={() => moveColumnFromDropdown(index)}>
+            {index + 1 + (index === props.column.boardIndex ? ' (current)' : '')}
+        </span>;
+
+    const handleOnToggle = (isOpen: boolean) => {
+        if (isOpen === false) setIsMoveListMenuOpen(false);
+        setIsActionsDropdownOpen(!isActionsDropdownOpen);
+    };
 
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
@@ -265,9 +300,9 @@ export function Column(props: IColumnProps) {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setColumnTitle(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)}
                                     onBlur={() => props.changeColumnTitle(props.column.id, columnTitle)} />
-                                <Dropdown onToggle={(isOpen: boolean) => { if (isOpen === false) setIsMoveListMenuOpen(false) }}>
-                                    <Dropdown.Toggle id='dropdown-toggle' as={customToggle} />
-                                    <Dropdown.Menu>
+                                <Dropdown show={isActionsDropdownOpen} onToggle={(isOpen: boolean) => handleOnToggle(isOpen)}>
+                                    <Dropdown.Toggle id='actions-dropdown-toggle' as={actionsToggle} />
+                                    <Dropdown.Menu bsPrefix='dropdown-menu actions-dropdown-menu'>
                                         {isMoveListMenuOpen === true &&
                                             <div>
                                                 <img
@@ -275,14 +310,15 @@ export function Column(props: IColumnProps) {
                                                     alt='back'
                                                     className='back-arrow'
                                                     onClick={() => setIsMoveListMenuOpen(false)} />
-                                                <div className='position-btn'>
-                                                    <div>
-                                                        <span>Position</span>
-                                                    </div>
-                                                    <div>
-                                                        <span>{props.column.boardIndex + 1}</span>
-                                                    </div>
-                                                </div>
+                                                <Dropdown>
+                                                    <Dropdown.Toggle id='position-dropdown-toggle' as={positionToggle} />
+                                                    <Dropdown.Menu bsPrefix='dropdown-menu position-dropdown-menu'>
+                                                        {new Array(props.columnCount)
+                                                            .fill('')
+                                                            .map((_x, i) => <Dropdown.Item key={i} as={() => positionDropdownItem(i)} />)
+                                                        }
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
                                             </div>
                                         }
                                         {isMoveListMenuOpen === false &&
