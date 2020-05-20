@@ -246,6 +246,22 @@ body {
     background-color: rgba(9, 30, 66, .1);
 }
 
+.position-btn {
+    font-family: 'Montserrat Medium';
+    font-size: 10px;
+    background-color: rgba(9, 30, 66, .05);
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    height: 50px;
+    width: 100%;
+    padding: 11px;
+}
+
+.position-btn:hover {
+    background-color: rgba(9, 30, 66, .1);
+}
+
 .delete-card-btn {
     margin-left: 33px;
     margin-top: 10px;
@@ -263,11 +279,13 @@ body {
 .back-arrow {
     height: 24px;
     width: 24px;
-    margin-left: 20px;
+    cursor: pointer;
 }
 
 .dropdown-menu {
     cursor: default;
+    width: 200px;
+    padding: 10px 10px 10px 10px;
 }
 
 .dropdown-item {

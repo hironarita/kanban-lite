@@ -228,16 +228,20 @@ export function Column(props: IColumnProps) {
         setIsMoveListMenuOpen(true);
     }
 
-    const CustomToggle = React.forwardRef<any, any>(({ children, onClick }, toggleRef) => (
+    const customToggle = React.forwardRef<any, any>(({ children, onClick }, toggleRef) => (
         <img
             src={ActionsIcon}
             alt='actions icon'
-            ref={toggleRef as any}
+            ref={toggleRef}
             onClick={(e) => {
                 e.preventDefault();
                 onClick(e);
             }} />
     ));
+
+    const moveDropdownItem = () => <span className='dropdown-item' onClick={e => openMoveListMenu(e)}>Move List...</span>;
+
+    const deleteDropdownItem = () => <span className='dropdown-item' onClick={e => removeColumn()}>Delete</span>;
 
     // allows for the Column component to be both dragged and dropped on
     drag(drop(ref));
@@ -261,18 +265,32 @@ export function Column(props: IColumnProps) {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setColumnTitle(e.target.value)}
                                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e.key)}
                                     onBlur={() => props.changeColumnTitle(props.column.id, columnTitle)} />
-                                <Dropdown>
-                                    <Dropdown.Toggle id="dropdown-basic" as={CustomToggle}>
-                                    </Dropdown.Toggle>
-
+                                <Dropdown onToggle={(isOpen: boolean) => { if (isOpen === false) setIsMoveListMenuOpen(false) }}>
+                                    <Dropdown.Toggle id='dropdown-toggle' as={customToggle} />
                                     <Dropdown.Menu>
-                                        {isMoveListMenuOpen === true && <img src={BackArrow} alt='back' className='back-arrow' />}
-                                        <Dropdown.Item>
-                                            <span onClick={e => openMoveListMenu(e)}>Move List...</span>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item>
-                                            <span onClick={e => removeColumn()}>Delete</span>
-                                        </Dropdown.Item>
+                                        {isMoveListMenuOpen === true &&
+                                            <div>
+                                                <img
+                                                    src={BackArrow}
+                                                    alt='back'
+                                                    className='back-arrow'
+                                                    onClick={() => setIsMoveListMenuOpen(false)} />
+                                                <div className='position-btn'>
+                                                    <div>
+                                                        <span>Position</span>
+                                                    </div>
+                                                    <div>
+                                                        <span>{props.column.boardIndex + 1}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        {isMoveListMenuOpen === false &&
+                                            <div>
+                                                <Dropdown.Item as={moveDropdownItem} />
+                                                <Dropdown.Item as={deleteDropdownItem} />
+                                            </div>
+                                        }
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </div>
