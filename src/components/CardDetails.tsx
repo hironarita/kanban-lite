@@ -242,7 +242,7 @@ export function CardDetails(props: ICardDetailsProps) {
                         <Dropdown.Menu bsPrefix='dropdown-menu actions-dropdown-menu move-card-dropdown'>
                             <Dropdown show={isMoveColumnDropdownOpen} onToggle={() => setIsMoveColumnDropdownOpen(!isMoveColumnDropdownOpen)}>
                                 <Dropdown.Toggle id='move-column-dropdown-toggle' as={columnToggle} />
-                                <Dropdown.Menu bsPrefix='dropdown-menu column-dropdown-menu column-position-dropdown'>
+                                <Dropdown.Menu bsPrefix='dropdown-menu column-position-dropdown'>
                                     {props.columns.map(x => <Dropdown.Item key={x.id} as={() => colDropdownItem(x)} />)}
                                 </Dropdown.Menu>
                             </Dropdown>
