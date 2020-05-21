@@ -66,6 +66,8 @@ export function Column(props: IColumnProps) {
     const [displayFirstPlaceholderCard, setDisplayFirstPlaceholderCard] = useState(false);
     const [isActionsDropdownOpen, setIsActionsDropdownOpen] = useState(false);
     const [isMoveListMenuOpen, setIsMoveListMenuOpen] = useState(false);
+    const [moveIndex, setMoveIndex] = useState(props.column.boardIndex);
+    const [isPositionDropdownOpen, setIsPositionDropdownOpen] = useState(false);
 
     const columnIdAsString = props.column.id.toString();
 
@@ -256,25 +258,33 @@ export function Column(props: IColumnProps) {
                     <span>Position</span>
                 </div>
                 <div>
-                    <span>{props.column.boardIndex + 1}</span>
+                    <span>{moveIndex + 1}</span>
                 </div>
         </div>
     ));
 
-    const moveColumnFromDropdown = (index: number) => {
+    const setMoveIndexAndCloseMenu = (index: number) => {
+        setMoveIndex(index);
+        setIsPositionDropdownOpen(false);
+    };
+
+    const moveColumnFromDropdown = () => {
         setIsActionsDropdownOpen(false);
         let newColumn = { ...props.column };
-        newColumn = { ...newColumn, boardIndex: index === 0 ? 0 : index + 1, isNew: true };
+        newColumn = { ...newColumn, boardIndex: moveIndex === 0 ? 0 : moveIndex + 1, isNew: true };
         props.moveColumn(props.column.id, newColumn, props.column.boardIndex);
     };
 
     const positionDropdownItem = (index: number) =>
-        <span className='dropdown-item position-dropdown-item' onClick={() => moveColumnFromDropdown(index)}>
+        <span className='dropdown-item position-dropdown-item' onClick={() => setMoveIndexAndCloseMenu(index)}>
             {index + 1 + (index === props.column.boardIndex ? ' (current)' : '')}
         </span>;
 
     const handleOnToggle = (isOpen: boolean) => {
-        if (isOpen === false) setIsMoveListMenuOpen(false);
+        if (isOpen === false) {
+            setIsMoveListMenuOpen(false);
+            setMoveIndex(props.column.boardIndex);
+        }
         setIsActionsDropdownOpen(!isActionsDropdownOpen);
     };
 
@@ -310,7 +320,7 @@ export function Column(props: IColumnProps) {
                                                     alt='back'
                                                     className='back-arrow'
                                                     onClick={() => setIsMoveListMenuOpen(false)} />
-                                                <Dropdown>
+                                                <Dropdown show={isPositionDropdownOpen} onToggle={() => setIsPositionDropdownOpen(!isPositionDropdownOpen)}>
                                                     <Dropdown.Toggle id='position-dropdown-toggle' as={positionToggle} />
                                                     <Dropdown.Menu bsPrefix='dropdown-menu position-dropdown-menu'>
                                                         {new Array(props.columnCount)
@@ -319,6 +329,12 @@ export function Column(props: IColumnProps) {
                                                         }
                                                     </Dropdown.Menu>
                                                 </Dropdown>
+                                                <button
+                                                    className='btn add-card-button mt-3'
+                                                    disabled={props.isLoading === true}
+                                                    onClick={() => moveColumnFromDropdown()}>
+                                                    Move
+                                                </button>
                                             </div>
                                         }
                                         {isMoveListMenuOpen === false &&

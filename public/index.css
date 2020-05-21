@@ -263,8 +263,7 @@ body {
 }
 
 .delete-card-btn {
-    margin-left: 33px;
-    margin-top: 10px;
+    margin-left: 10px;
 }
 
 .card-details-textarea {
@@ -298,6 +297,11 @@ body {
 
 .dropdown-item {
     cursor:  pointer;
+}
+
+.card-details-buttons-container {
+    margin-left: 33px;
+    margin-top: 10px;
 }
 
 @media all and (max-width: 425px) {

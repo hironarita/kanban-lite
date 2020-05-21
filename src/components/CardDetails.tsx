@@ -58,7 +58,7 @@ export function CardDetails(props: ICardDetailsProps) {
             title,
             description: description.replace(/\s/g, '').length === 0
                 ? ''
-                : description 
+                : description
         };
         props.setIsLoading(true);
         try {
@@ -132,12 +132,19 @@ export function CardDetails(props: ICardDetailsProps) {
                     <img src={ActionsIcon} alt='actions icon' />
                     <span className='card-description'>Actions</span>
                 </div>
-                <button
-                    className='btn btn-danger delete-card-btn'
-                    disabled={props.isLoading === true}
-                    onClick={() => removeCard()}>
-                    Delete
+                <div className='d-flex card-details-buttons-container'>
+                    <button
+                        className='btn add-card-button'
+                        disabled={props.isLoading === true}>
+                        Move Card
+                    </button>
+                    <button
+                        className='btn btn-danger delete-card-btn'
+                        disabled={props.isLoading === true}
+                        onClick={() => removeCard()}>
+                        Delete
                 </button>
+                </div>
             </Modal.Body>
         </Modal>
     );
