@@ -16,6 +16,7 @@ declare interface ICardDetailsProps {
     readonly cards: ICard[];
     readonly setIsLoading: (x: boolean) => void;
     readonly refetchCards: () => Promise<void>;
+    readonly moveCard: (newCard: ICard, oldCard: ICard) => Promise<void>;
 }
 export function CardDetails(props: ICardDetailsProps) {
     const titleTextarea = useRef<any>(null);
@@ -58,7 +59,13 @@ export function CardDetails(props: ICardDetailsProps) {
 
     const cardCount = props.cards
         .filter(x => x.column_id === moveColumnId)
-        .length + 1 || 1;
+        .length;
+    
+    const indexOptionCount = [0, 1].includes(cardCount)
+        ? 1
+        : card?.column_id === moveColumnId
+            ? cardCount
+            : cardCount + 1;
 
     const handleClose = () => history.push(Path.Home);
 
@@ -139,8 +146,10 @@ export function CardDetails(props: ICardDetailsProps) {
         </div>
     ));
 
-    const setMoveColumnIdAndCloseDropdown = (id: number) => {
-        setMoveColumnId(id);
+    const setMoveColumnIdAndCloseDropdown = (columnId: number) => {
+        setMoveColumnId(columnId);
+        const index = props.cards.filter(x => x.column_id === columnId).length;
+        setMoveIndex(index);
         setIsMoveColumnDropdownOpen(false);
     };
 
@@ -175,6 +184,15 @@ export function CardDetails(props: ICardDetailsProps) {
         <span className='dropdown-item position-dropdown-item' onClick={() => setMoveIndexAndCloseMenu(index)}>
             {index + 1 + (index === card?.columnIndex && moveColumnId === card?.column_id ? ' (current)' : '')}
         </span>;
+
+    const moveCard = async () => {
+        setIsMoveDropdownOpen(false);
+        const oldCard = card!;
+        let newCard = { ...oldCard };
+        newCard = { ...oldCard, column_id: moveColumnId, columnIndex: moveIndex, isNew: true };
+        await props.moveCard(newCard, oldCard);
+        await getCardAndSetState();
+    };
 
     return (
         <Modal show={true} onHide={handleClose} animation={false}>
@@ -231,12 +249,18 @@ export function CardDetails(props: ICardDetailsProps) {
                             <Dropdown bsPrefix='dropdown mt-2' show={isMoveIndexDropdownOpen} onToggle={() => setIsMoveIndexDropdownOpen(!isMoveIndexDropdownOpen)}>
                                 <Dropdown.Toggle id='move-index-dropdown-toggle' as={indexToggle} />
                                 <Dropdown.Menu bsPrefix='dropdown-menu column-dropdown-menu'>
-                                    {new Array(cardCount)
+                                    {new Array(indexOptionCount)
                                         .fill('')
                                         .map((_x, i) => <Dropdown.Item key={i} as={() => indexDropdownItem(i)} />)
                                     }
                                 </Dropdown.Menu>
                             </Dropdown>
+                            <button
+                                className='btn add-card-button mt-3'
+                                disabled={props.isLoading === true}
+                                onClick={() => moveCard()}>
+                                Move
+                        </button>
                         </Dropdown.Menu>
                     </Dropdown>
                     <button

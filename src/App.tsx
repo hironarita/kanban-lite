@@ -244,6 +244,7 @@ function App(props: IAppProps) {
 					isLoading={isLoading}
 					columns={columns}
 					cards={cards}
+					moveCard={(newCard: ICard, oldCard: ICard) => moveCard(newCard, oldCard)}
 					setIsLoading={(x: boolean) => setIsLoading(x)}
 					refetchCards={() => getCardsAndSetState()} />
 			</Route>
