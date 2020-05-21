@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useHistory } from 'react-router-dom';
+import { isMobile, isTablet } from 'react-device-detect';
 import { Path } from '../utilities/Enums';
 
 declare interface ICardProps {
@@ -103,7 +104,7 @@ export function Card(props: ICardProps) {
             {isDragging === false &&
                 <div
                     ref={cardRef}
-                    className={'card trello-card ' + (props.hoverCardId === props.card.id ? 'active-card' : '')}
+                    className={'card trello-card ' + (props.hoverCardId === props.card.id && !isMobile && !isTablet ? 'active-card' : '')}
                     onMouseOver={() => { if (props.isDragInProgress === false) props.setHoverCardId(props.card.id) }}
                     onMouseLeave={() => props.setHoverCardId(0)}
                     onClick={() => history.push(Path.Card.replace(':id', props.card.id.toString()))}>
