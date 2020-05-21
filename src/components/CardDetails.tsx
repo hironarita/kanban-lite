@@ -242,13 +242,13 @@ export function CardDetails(props: ICardDetailsProps) {
                         <Dropdown.Menu bsPrefix='dropdown-menu actions-dropdown-menu move-card-dropdown'>
                             <Dropdown show={isMoveColumnDropdownOpen} onToggle={() => setIsMoveColumnDropdownOpen(!isMoveColumnDropdownOpen)}>
                                 <Dropdown.Toggle id='move-column-dropdown-toggle' as={columnToggle} />
-                                <Dropdown.Menu bsPrefix='dropdown-menu column-position-dropdown'>
+                                <Dropdown.Menu bsPrefix='dropdown-menu column-dropdown-menu'>
                                     {props.columns.map(x => <Dropdown.Item key={x.id} as={() => colDropdownItem(x)} />)}
                                 </Dropdown.Menu>
                             </Dropdown>
                             <Dropdown bsPrefix='dropdown mt-2' show={isMoveIndexDropdownOpen} onToggle={() => setIsMoveIndexDropdownOpen(!isMoveIndexDropdownOpen)}>
                                 <Dropdown.Toggle id='move-index-dropdown-toggle' as={indexToggle} />
-                                <Dropdown.Menu bsPrefix='dropdown-menu column-position-dropdown'>
+                                <Dropdown.Menu bsPrefix='dropdown-menu column-dropdown-menu'>
                                     {new Array(indexOptionCount)
                                         .fill('')
                                         .map((_x, i) => <Dropdown.Item key={i} as={() => indexDropdownItem(i)} />)

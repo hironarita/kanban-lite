@@ -309,17 +309,6 @@ body {
     min-width: 178px;
 }
 
-.move-card-dropdown {
-    bottom: auto !important;
-    top: 78px !important;
-}
-
-.column-position-dropdown {
-    min-width: 178px;
-    bottom: auto !important;
-    top: 102px !important;
-}
-
 @media all and (max-width: 425px) {
     .logged-in-logo {
         font-size: 24px;
