@@ -39,6 +39,8 @@ export function Card(props: ICardProps) {
     const [displayDroppableCardAbove, setDisplayDroppableCardAbove] = useState(false);
     const [displayDroppableCardBelow, setDisplayDroppableCardBelow] = useState(false);
 
+    const onDesktop = !isMobile && !isTablet;
+
     const [, drag, preview] = useDrag({
         item: { type: 'card', card: props.card },
         collect: monitor => {
@@ -104,9 +106,9 @@ export function Card(props: ICardProps) {
             {isDragging === false &&
                 <div
                     ref={cardRef}
-                    className={'card trello-card ' + (props.hoverCardId === props.card.id && !isMobile && !isTablet ? 'active-card' : '')}
-                    onMouseOver={() => { if (props.isDragInProgress === false) props.setHoverCardId(props.card.id) }}
-                    onMouseLeave={() => props.setHoverCardId(0)}
+                    className={'card trello-card ' + (props.hoverCardId === props.card.id && onDesktop ? 'active-card' : '')}
+                    onMouseOver={() => { if (props.isDragInProgress === false && onDesktop) props.setHoverCardId(props.card.id) }}
+                    onMouseLeave={() => { if (onDesktop) props.setHoverCardId(0) }}
                     onClick={() => history.push(Path.Card.replace(':id', props.card.id.toString()))}>
                     <span>{isDragging === false && props.card.title}</span>
                 </div>
