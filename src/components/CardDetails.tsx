@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Modal } from 'react-bootstrap';
+import { Modal, Dropdown } from 'react-bootstrap';
 import TextareaAutosize from 'react-textarea-autosize';
 import { swal } from '../utilities/Utilities';
 import { Path } from '../utilities/Enums';
@@ -12,6 +12,7 @@ import ActionsIcon from '../images/actions.svg';
 
 declare interface ICardDetailsProps {
     readonly isLoading: boolean;
+    readonly columns: IColumn[];
     readonly setIsLoading: (x: boolean) => void;
     readonly refetchCards: () => Promise<void>;
 }
@@ -25,12 +26,18 @@ export function CardDetails(props: ICardDetailsProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [isEditingDescription, setIsEditingDescription] = useState(false);
+    const [isMoveDropdownOpen, setIsMoveDropdownOpen] = useState(false);
+    const [moveColumnId, setMoveColumnId] = useState(0);
+    const [moveIndex, setMoveIndex] = useState(0);
+    const [isMoveColumnDropdownOpen, setIsMoveColumnDropdownOpen] = useState(false);
 
     const getCardAndSetState = useCallback(async () => {
         const card = await get<ICard>('/cards/card/' + id);
         setCard(card);
         setTitle(card.title);
         setDescription(card.description);
+        setMoveColumnId(card.column_id);
+        setMoveIndex(card.columnIndex);
     }, [id]);
 
     useEffect(() => {
@@ -42,6 +49,8 @@ export function CardDetails(props: ICardDetailsProps) {
     useEffect(() => {
         if (isEditingDescription === true) descriptionTextarea.current.focus();
     }, [isEditingDescription]);
+
+    const moveColumnTitle = props.columns.find(x => x.id === moveColumnId)?.title;
 
     const handleClose = () => history.push(Path.Home);
 
@@ -90,6 +99,36 @@ export function CardDetails(props: ICardDetailsProps) {
         }
     };
 
+    const moveToggle = React.forwardRef<any, any>(({ children, onClick }, ref) => (
+        <button
+            ref={ref}
+            className='btn add-card-button'
+            disabled={props.isLoading === true}
+            onClick={(e) => {
+                e.preventDefault();
+                onClick(e);
+            }}>
+            Move Card
+        </button>
+    ));
+
+    const columnToggle = React.forwardRef<any, any>(({ children, onClick }, colToggleRef) => (
+        <div
+            ref={colToggleRef}
+            className='position-btn'
+            onClick={(e) => {
+                e.preventDefault();
+                onClick(e);
+            }}>
+            <div>
+                <span className='dropdown-label'>List</span>
+            </div>
+            <div>
+                <span>{moveColumnTitle ? moveColumnTitle : ''}</span>
+            </div>
+        </div>
+    ));
+
     return (
         <Modal show={true} onHide={handleClose} animation={false}>
             <Modal.Header className='d-flex align-items-center modal-background' closeButton>
@@ -133,11 +172,15 @@ export function CardDetails(props: ICardDetailsProps) {
                     <span className='card-description'>Actions</span>
                 </div>
                 <div className='d-flex card-details-buttons-container'>
-                    <button
-                        className='btn add-card-button'
-                        disabled={props.isLoading === true}>
-                        Move Card
-                    </button>
+                    <Dropdown show={isMoveDropdownOpen} onToggle={() => setIsMoveDropdownOpen(!isMoveDropdownOpen)}>
+                        <Dropdown.Toggle id='move-dropdown-toggle' as={moveToggle} />
+                        <Dropdown.Menu bsPrefix='dropdown-menu actions-dropdown-menu'>
+                            <Dropdown show={isMoveColumnDropdownOpen} onToggle={() => setIsMoveColumnDropdownOpen(!isMoveColumnDropdownOpen)}>
+                                <Dropdown.Toggle id='move-column-dropdown-toggle' as={columnToggle} />
+                            </Dropdown>
+                        </Dropdown.Menu>
+                    </Dropdown>
+
                     <button
                         className='btn btn-danger delete-card-btn'
                         disabled={props.isLoading === true}

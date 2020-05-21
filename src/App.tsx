@@ -242,6 +242,7 @@ function App(props: IAppProps) {
 			<Route path={Path.Card}>
 				<CardDetails
 					isLoading={isLoading}
+					columns={columns}
 					setIsLoading={(x: boolean) => setIsLoading(x)}
 					refetchCards={() => getCardsAndSetState()} />
 			</Route>

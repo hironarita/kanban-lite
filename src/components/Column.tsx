@@ -255,7 +255,7 @@ export function Column(props: IColumnProps) {
                 onClick(e);
             }}>
                 <div>
-                    <span>Position</span>
+                    <span className='dropdown-label'>Position</span>
                 </div>
                 <div>
                     <span>{moveIndex + 1}</span>
