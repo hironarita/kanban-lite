@@ -13,6 +13,7 @@ import ActionsIcon from '../images/actions.svg';
 declare interface ICardDetailsProps {
     readonly isLoading: boolean;
     readonly columns: IColumn[];
+    readonly cards: ICard[];
     readonly setIsLoading: (x: boolean) => void;
     readonly refetchCards: () => Promise<void>;
 }
@@ -30,6 +31,7 @@ export function CardDetails(props: ICardDetailsProps) {
     const [moveColumnId, setMoveColumnId] = useState(0);
     const [moveIndex, setMoveIndex] = useState(0);
     const [isMoveColumnDropdownOpen, setIsMoveColumnDropdownOpen] = useState(false);
+    const [isMoveIndexDropdownOpen, setIsMoveIndexDropdownOpen] = useState(false);
 
     const getCardAndSetState = useCallback(async () => {
         const card = await get<ICard>('/cards/card/' + id);
@@ -50,7 +52,13 @@ export function CardDetails(props: ICardDetailsProps) {
         if (isEditingDescription === true) descriptionTextarea.current.focus();
     }, [isEditingDescription]);
 
-    const moveColumnTitle = props.columns.find(x => x.id === moveColumnId)?.title;
+    const moveColumnTitle = props.columns
+        .find(x => x.id === moveColumnId)
+        ?.title;
+
+    const cardCount = props.cards
+        .filter(x => x.column_id === moveColumnId)
+        .length + 1 || 1;
 
     const handleClose = () => history.push(Path.Home);
 
@@ -112,6 +120,8 @@ export function CardDetails(props: ICardDetailsProps) {
         </button>
     ));
 
+    const truncateString = (x: string) => x.length > 30 ? x.substring(0, 29) + '...' : x;
+
     const columnToggle = React.forwardRef<any, any>(({ children, onClick }, colToggleRef) => (
         <div
             ref={colToggleRef}
@@ -124,7 +134,7 @@ export function CardDetails(props: ICardDetailsProps) {
                 <span className='dropdown-label'>List</span>
             </div>
             <div>
-                <span>{moveColumnTitle ? moveColumnTitle : ''}</span>
+                <span>{moveColumnTitle ? truncateString(moveColumnTitle) : ''}</span>
             </div>
         </div>
     ));
@@ -136,7 +146,34 @@ export function CardDetails(props: ICardDetailsProps) {
 
     const colDropdownItem = (column: IColumn) =>
         <span className='dropdown-item position-dropdown-item' onClick={() => setMoveColumnIdAndCloseDropdown(column.id)}>
-            {column.title + (column.id === card?.column_id ? ' (current)' : '')}
+            {truncateString(column.title) + (column.id === card?.column_id ? ' (current)' : '')}
+        </span>;
+
+    const indexToggle = React.forwardRef<any, any>(({ children, onClick }, indexToggleRef) => (
+        <div
+            ref={indexToggleRef}
+            className='position-btn move-column-btn'
+            onClick={(e) => {
+                e.preventDefault();
+                onClick(e);
+            }}>
+            <div>
+                <span className='dropdown-label'>Position</span>
+            </div>
+            <div>
+                <span>{moveIndex + 1}</span>
+            </div>
+        </div>
+    ));
+
+    const setMoveIndexAndCloseMenu = (index: number) => {
+        setMoveIndex(index);
+        setIsMoveIndexDropdownOpen(false);
+    };
+
+    const indexDropdownItem = (index: number) =>
+        <span className='dropdown-item position-dropdown-item' onClick={() => setMoveIndexAndCloseMenu(index)}>
+            {index + 1 + (index === card?.columnIndex && moveColumnId === card?.column_id ? ' (current)' : '')}
         </span>;
 
     return (
@@ -187,8 +224,17 @@ export function CardDetails(props: ICardDetailsProps) {
                         <Dropdown.Menu bsPrefix='dropdown-menu actions-dropdown-menu'>
                             <Dropdown show={isMoveColumnDropdownOpen} onToggle={() => setIsMoveColumnDropdownOpen(!isMoveColumnDropdownOpen)}>
                                 <Dropdown.Toggle id='move-column-dropdown-toggle' as={columnToggle} />
-                                <Dropdown.Menu bsPrefix='dropdown-menu position-dropdown-menu'>
+                                <Dropdown.Menu bsPrefix='dropdown-menu column-dropdown-menu'>
                                     {props.columns.map(x => <Dropdown.Item key={x.id} as={() => colDropdownItem(x)} />)}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <Dropdown bsPrefix='dropdown mt-2' show={isMoveIndexDropdownOpen} onToggle={() => setIsMoveIndexDropdownOpen(!isMoveIndexDropdownOpen)}>
+                                <Dropdown.Toggle id='move-index-dropdown-toggle' as={indexToggle} />
+                                <Dropdown.Menu bsPrefix='dropdown-menu column-dropdown-menu'>
+                                    {new Array(cardCount)
+                                        .fill('')
+                                        .map((_x, i) => <Dropdown.Item key={i} as={() => indexDropdownItem(i)} />)
+                                    }
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Dropdown.Menu>
