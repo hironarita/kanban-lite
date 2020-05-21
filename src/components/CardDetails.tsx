@@ -189,7 +189,7 @@ export function CardDetails(props: ICardDetailsProps) {
         setIsMoveDropdownOpen(false);
         const oldCard = card!;
         let newCard = { ...oldCard };
-        newCard = { ...oldCard, column_id: moveColumnId, columnIndex: moveIndex, isNew: true };
+        newCard = { ...oldCard, column_id: moveColumnId, columnIndex: moveIndex === 0 ? 0 : moveIndex + 1, isNew: true };
         await props.moveCard(newCard, oldCard);
         await getCardAndSetState();
     };
@@ -239,7 +239,7 @@ export function CardDetails(props: ICardDetailsProps) {
                 <div className='d-flex card-details-buttons-container'>
                     <Dropdown show={isMoveDropdownOpen} onToggle={() => setIsMoveDropdownOpen(!isMoveDropdownOpen)}>
                         <Dropdown.Toggle id='move-dropdown-toggle' as={moveToggle} />
-                        <Dropdown.Menu bsPrefix='dropdown-menu actions-dropdown-menu'>
+                        <Dropdown.Menu bsPrefix='dropdown-menu actions-dropdown-menu move-card-dropdown'>
                             <Dropdown show={isMoveColumnDropdownOpen} onToggle={() => setIsMoveColumnDropdownOpen(!isMoveColumnDropdownOpen)}>
                                 <Dropdown.Toggle id='move-column-dropdown-toggle' as={columnToggle} />
                                 <Dropdown.Menu bsPrefix='dropdown-menu column-dropdown-menu'>
