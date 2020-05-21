@@ -243,10 +243,6 @@ body {
     width: 90%;
 }
 
-.no-description-placeholder:hover {
-    background-color: rgba(9, 30, 66, .1);
-}
-
 .position-btn {
     font-family: 'Montserrat Medium';
     font-size: 10px;
@@ -257,10 +253,6 @@ body {
     height: 50px;
     width: 100%;
     padding: 10px;
-}
-
-.position-btn:hover {
-    background-color: rgba(9, 30, 66, .1);
 }
 
 .move-column-btn {
@@ -320,6 +312,16 @@ body {
 @media all and (max-width: 425px) {
     .logged-in-logo {
         font-size: 24px;
+    }
+}
+
+@media (hover) {
+    .no-description-placeholder:hover {
+        background-color: rgba(9, 30, 66, .1);
+    }
+
+    .position-btn:hover {
+        background-color: rgba(9, 30, 66, .1);
     }
 }
 
