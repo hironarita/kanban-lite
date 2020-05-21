@@ -262,6 +262,10 @@ body {
     background-color: rgba(9, 30, 66, .1);
 }
 
+.move-column-btn {
+    margin-top: 0px;
+}
+
 .delete-card-btn {
     margin-left: 10px;
 }

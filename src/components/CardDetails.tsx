@@ -115,7 +115,7 @@ export function CardDetails(props: ICardDetailsProps) {
     const columnToggle = React.forwardRef<any, any>(({ children, onClick }, colToggleRef) => (
         <div
             ref={colToggleRef}
-            className='position-btn'
+            className='position-btn move-column-btn'
             onClick={(e) => {
                 e.preventDefault();
                 onClick(e);
@@ -128,6 +128,16 @@ export function CardDetails(props: ICardDetailsProps) {
             </div>
         </div>
     ));
+
+    const setMoveColumnIdAndCloseDropdown = (id: number) => {
+        setMoveColumnId(id);
+        setIsMoveColumnDropdownOpen(false);
+    };
+
+    const colDropdownItem = (column: IColumn) =>
+        <span className='dropdown-item position-dropdown-item' onClick={() => setMoveColumnIdAndCloseDropdown(column.id)}>
+            {column.title + (column.id === card?.column_id ? ' (current)' : '')}
+        </span>;
 
     return (
         <Modal show={true} onHide={handleClose} animation={false}>
@@ -177,16 +187,18 @@ export function CardDetails(props: ICardDetailsProps) {
                         <Dropdown.Menu bsPrefix='dropdown-menu actions-dropdown-menu'>
                             <Dropdown show={isMoveColumnDropdownOpen} onToggle={() => setIsMoveColumnDropdownOpen(!isMoveColumnDropdownOpen)}>
                                 <Dropdown.Toggle id='move-column-dropdown-toggle' as={columnToggle} />
+                                <Dropdown.Menu bsPrefix='dropdown-menu position-dropdown-menu'>
+                                    {props.columns.map(x => <Dropdown.Item key={x.id} as={() => colDropdownItem(x)} />)}
+                                </Dropdown.Menu>
                             </Dropdown>
                         </Dropdown.Menu>
                     </Dropdown>
-
                     <button
                         className='btn btn-danger delete-card-btn'
                         disabled={props.isLoading === true}
                         onClick={() => removeCard()}>
                         Delete
-                </button>
+                    </button>
                 </div>
             </Modal.Body>
         </Modal>
